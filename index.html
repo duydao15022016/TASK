@@ -1,127 +1,93 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Eisenhower Pro</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; user-select: none; }
-        body { background: #f8fafc; color: #1e293b; min-height: 100vh; padding: 10px; }
-        .container { max-width: 400px; margin: 0 auto; }
-        
-        /* Streak Badge */
-        .streak-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background: #fff;
-            padding: 6px 12px;
-            border-radius: 50px;
-            margin-bottom: 12px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .streak-text { font-size: 11px; font-weight: 800; color: #64748b; }
-        .streak-count { font-size: 12px; font-weight: 900; color: #f59e0b; }
-
-        section { background: white; border-radius: 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
-        .header { padding: 10px; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
-        .title { font-size: 11px; font-weight: 900; color: #475569; }
-        
-        .task-list { list-style: none; padding: 0 10px 10px 10px; }
-        .task-item { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-        .checkbox { width: 18px; height: 18px; margin-right: 10px; }
-        .task-label { font-size: 12px; font-weight: 600; flex: 1; }
-        .task-label.done { text-decoration: line-through; color: #94a3b8; }
-        
-        footer { text-align: center; font-size: 9px; color: #94a3b8; margin-top: 20px; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="streak-container">
-        <span class="streak-text">🔥 Chuỗi rèn luyện:</span>
-        <span class="streak-count" id="streak-display">0 ngày</span>
-    </div>
-
-    <section id="section-q2">
-        <div class="header">
-            <span class="title">RÈN LUYỆN HÀNG NGÀY</span>
-            <span id="count-q2" style="font-size:10px; font-weight:bold;">0/10</span>
-        </div>
-        <ul class="task-list" id="list-q2"></ul>
-    </section>
-</div>
-
-<footer>Dữ liệu lưu cục bộ</footer>
-
-<script>
-    let state = {
-        streak: 0,
-        last_date: "",
-        tasks: [
-            {id:1, title:"Quán Âm 3 tiếng", done:false},
-            {id:2, title:"Phụng sự 30'", done:false},
-            {id:3, title:"Luyện hơi - Luyện thanh", done:false},
-            {id:4, title:"DC xoang", done:false},
-            {id:5, title:"DC suy thận", done:false},
-            {id:6, title:"DC tổ đĩa", done:false},
-            {id:7, title:"DC tỳ - ổ bụng", done:false},
-            {id:8, title:"Khai khớp", done:false},
-            {id:9, title:"Giải cơ", done:false},
-            {id:10, title:"Thông kinh", done:false}
-        ]
-    };
-
-    function updateStreak() {
-        const today = new Date().toDateString();
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        
-        if (state.last_date === yesterday.toDateString()) {
-            state.streak += 1;
-        } else if (state.last_date !== today) {
-            state.streak = 0;
-        }
-        state.last_date = today;
-        document.getElementById('streak-display').innerText = state.streak + " ngày";
-    }
-
-    function toggleTask(id) {
-        const task = state.tasks.find(t => t.id === id);
-        task.done = !task.done;
-        
-        // Kiểm tra xem tất cả đã xong chưa để tăng streak
-        const allDone = state.tasks.every(t => t.done);
-        if (allDone && state.last_date !== new Date().toDateString()) {
-            updateStreak();
-        }
-        
-        save();
-        render();
-    }
-
-    function save() { localStorage.setItem('eisenhower_pro', JSON.stringify(state)); }
-    
-    function render() {
-        const list = document.getElementById('list-q2');
-        list.innerHTML = state.tasks.map(t => `
-            <li class="task-item">
-                <input type="checkbox" class="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id})">
-                <span class="task-label ${t.done?'done':''}">${t.title}</span>
-            </li>
-        `).join('');
-        document.getElementById('count-q2').innerText = state.tasks.filter(t=>t.done).length + "/10";
-    }
-
-    window.onload = () => {
-        const saved = localStorage.getItem('eisenhower_pro');
-        if (saved) state = JSON.parse(saved);
-        updateStreak();
-        render();
-    };
-</script>
-</body>
-</html>
+```html<!DOCTYPE html><html lang="vi"><head>    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">    <title>Mục Tiêu Về Nhà</title>    <style>        /* CSS Thuần túy - Không cần nạp từ Internet - Chạy offline 100% */        * {            box-sizing: border-box;            margin: 0;            padding: 0;            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;            -webkit-tap-highlight-color: transparent;            user-select: none;        }
+        body {            background: linear-gradient(135deg, #f1f5f9 0%, #fff5f5 100%);            color: #1e293b;            min-height: 100vh;            padding: 12px;            display: flex;            flex-direction: column;            align-items: center;        }
+        .container {            width: 100%;            max-width: 420px;            margin: 0 auto;            padding-bottom: 80px;        }
+        /* Header phong cách tối giản sáng sủa */        header {            text-align: center;            background: rgba(255, 255, 255, 0.85);            backdrop-filter: blur(10px);            padding: 16px;            border-radius: 20px;            border: 1px solid rgba(255, 255, 255, 0.6);            box-shadow: 0 4px 12px rgba(0,0,0,0.03);            margin-bottom: 12px;        }
+        header p.title-sub {            font-size: 10px;            font-weight: 800;            text-transform: uppercase;            letter-spacing: 1.5px;            color: #ef4444;            margin-bottom: 2px;        }
+        header h1 {            font-size: 22px;            font-weight: 900;            color: #0f172a;            letter-spacing: 0.5px;        }
+        .divider {            width: 40px;            height: 2px;            background: linear-gradient(90deg, #ef4444, #10b981);            margin: 8px auto;            border-radius: 2px;        }
+        header p.title-sub-green {            font-size: 10px;            font-weight: 800;            text-transform: uppercase;            letter-spacing: 1.5px;            color: #10b981;            margin-bottom: 2px;        }
+        header h2 {            font-size: 16px;            font-weight: 800;            color: #334155;        }
+        /* Ô thời gian thực nhỏ gọn tinh tế */        .clock-bar {            background: rgba(255, 255, 255, 0.9);            backdrop-filter: blur(10px);            padding: 8px 16px;            border-radius: 14px;            border: 1px solid #f1f5f9;            box-shadow: 0 2px 8px rgba(0,0,0,0.02);            display: flex;            align-items: center;            justify-content: space-between;            margin-bottom: 16px;        }
+        .clock-left {            display: flex;            align-items: center;            gap: 6px;            font-size: 12px;            font-weight: 600;            color: #475569;        }
+        .clock-left svg {            width: 15px;            height: 15px;            color: #ef4444;        }
+        .clock-time {            font-weight: 800;            color: #0f172a;            letter-spacing: 0.5px;            font-size: 13px;        }
+        .clock-right-badge {            font-size: 9px;            background: #e2e8f0;            color: #475569;            padding: 2px 8px;            border-radius: 99px;            font-weight: 700;        }
+        /* Cấu trúc các ô Ma Trận */        main {            display: flex;            flex-direction: column;            gap: 14px;            width: 100%;        }
+        section {            background: #ffffff;            border-radius: 20px;            box-shadow: 0 4px 15px rgba(0,0,0,0.03);            border-top: 1px solid rgba(255,255,255,0.7);            border-right: 1px solid rgba(0,0,0,0.02);            border-bottom: 1px solid rgba(0,0,0,0.02);            overflow: hidden;            transition: transform 0.2s;        }
+        /* Q1: Ô QUAN TRỌNG KHẨN CẤP ĐỎ RỰC RỠ TRÊN CÙNG */        #section-q1 {            border-left: 8px solid #ef4444;            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.08);        }
+        /* Q2: Ô QUAN TRỌNG KHÔNG KHẨN CẤP XANH LỤC */        #section-q2 {            border-left: 5px solid #10b981;        }
+        /* Tiêu đề góc phần tư */        .section-header {            padding: 12px 14px;            display: flex;            justify-content: space-between;            align-items: center;        }
+        #section-q1 .section-header {            background: rgba(239, 68, 68, 0.06);            border-bottom: 1px solid rgba(239, 68, 68, 0.1);        }
+        #section-q2 .section-header {            background: rgba(10, 185, 121, 0.06);            border-bottom: 1px solid rgba(10, 185, 121, 0.1);        }
+        .header-title-box {            display: flex;            align-items: center;            gap: 8px;        }
+        .header-icon-wrapper {            padding: 6px;            border-radius: 10px;            display: flex;            align-items: center;            justify-content: center;        }
+        #section-q1 .header-icon-wrapper {            background: rgba(239, 68, 68, 0.15);            color: #dc2626;        }
+        #section-q2 .header-icon-wrapper {            background: rgba(10, 185, 121, 0.15);            color: #059669;        }
+        .header-text-box h3 {            font-size: 12px;            font-weight: 900;            letter-spacing: 0.2px;        }
+        #section-q1 .header-text-box h3 { color: #b91c1c; }        #section-q2 .header-text-box h3 { color: #047857; }
+        .header-text-box p {            font-size: 9px;            font-weight: 700;            text-transform: uppercase;            color: #64748b;            margin-top: 1px;        }
+        .counter-badge {            font-size: 10px;            font-weight: 900;            padding: 2px 8px;            border-radius: 99px;        }
+        #section-q1 .counter-badge {            background: #ef4444;            color: #ffffff;        }
+        #section-q2 .counter-badge {            background: rgba(10, 185, 121, 0.2);            color: #047857;            border: 1px solid rgba(10, 185, 121, 0.3);        }
+        /* Khu vực nhập liệu & danh sách */        .section-content {            padding: 12px;        }
+        .input-group {            display: flex;            gap: 6px;            margin-bottom: 10px;        }
+        .input-group input {            flex: 1;            font-size: 12px;            padding: 8px 12px;            border-radius: 10px;            border: 1px solid #cbd5e1;            outline: none;            background: #f8fafc;            color: #1e293b;            transition: border 0.15s;        }
+        #section-q1 .input-group input:focus { border-color: #ef4444; }        #section-q2 .input-group input:focus { border-color: #10b981; }
+        .input-group button {            border: none;            padding: 0 14px;            border-radius: 10px;            color: white;            cursor: pointer;            display: flex;            align-items: center;            justify-content: center;        }
+        #section-q1 .input-group button { background: #ef4444; }        #section-q2 .input-group button { background: #10b981; }
+        .task-list {            list-style: none;            display: flex;            flex-direction: column;            gap: 8px;        }
+        .task-item {            display: flex;            align-items: center;            justify-content: space-between;            background: #f8fafc;            padding: 10px 12px;            border-radius: 12px;            border: 1px solid #f1f5f9;            box-shadow: 0 1px 3px rgba(0,0,0,0.01);        }
+        .task-label {            display: flex;            align-items: center;            gap: 10px;            cursor: pointer;            flex: 1;            min-width: 0;        }
+        .task-checkbox {            width: 18px;            height: 18px;            border-radius: 5px;            border: 2px solid #cbd5e1;            cursor: pointer;            appearance: none;            display: flex;            align-items: center;            justify-content: center;            transition: all 0.15s;            background: white;        }
+        .task-checkbox:checked {            border-color: currentColor;            background-color: currentColor;        }
+        /* Đánh dấu check thủ công bằng SVG tích hợp */        .task-checkbox:checked::after {            content: "";            width: 10px;            height: 6px;            border-left: 2px solid white;            border-bottom: 2px solid white;            transform: rotate(-45deg) translate(1px, -1px);        }
+        #section-q1 .task-checkbox { color: #ef4444; }        #section-q2 .task-checkbox { color: #10b981; }
+        .task-text {            font-size: 13px;            font-weight: 700;            color: #334155;            white-space: nowrap;            overflow: hidden;            text-overflow: ellipsis;        }
+        .task-text.done {            text-decoration: line-through;            color: #94a3b8 !important;        }
+        .delete-btn {            background: transparent;            border: none;            color: #94a3b8;            cursor: pointer;            padding: 4px;            border-radius: 6px;            display: flex;            align-items: center;            justify-content: center;        }
+        .delete-btn:hover {            color: #ef4444;            background: #fee2e2;        }
+        /* Chân trang điều khiển cố định */        footer {            position: fixed;            bottom: 0;            left: 0;            right: 0;            max-width: 420px;            margin: 0 auto;            background: rgba(255, 255, 255, 0.9);            backdrop-filter: blur(12px);            border-top: 1px solid #f1f5f9;            padding: 12px 16px;            display: flex;            justify-content: space-between;            align-items: center;            z-index: 100;            border-radius: 16px 16px 0 0;            box-shadow: 0 -4px 15px rgba(0,0,0,0.03);        }
+        .footer-btn {            border: none;            padding: 8px 14px;            font-size: 11px;            font-weight: 800;            border-radius: 10px;            cursor: pointer;            display: flex;            align-items: center;            gap: 4px;            transition: transform 0.1s;        }
+        .footer-btn-widget {            background: #4f46e5;            color: white;        }
+        .footer-btn-reset {            background: #fee2e2;            color: #ef4444;        }
+        /* CHẾ ĐỘ WIDGET THU GỌN */        .widget-header-mini {            display: none;            width: 100%;            justify-content: space-between;            align-items: center;            padding: 6px 10px;            background: rgba(255,255,255,0.7);            border-radius: 10px;            margin-bottom: 10px;            border: 1px solid rgba(255,255,255,0.5);        }
+        .widget-title-text {            font-size: 9px;            font-weight: 900;            color: #0f172a;            letter-spacing: 1px;        }
+        .widget-exit-btn {            background: #e2e8f0;            border: none;            padding: 2px 8px;            font-size: 8px;            font-weight: 800;            border-radius: 6px;            cursor: pointer;        }
+        /* Lớp phủ khi bật Widget Mode */        body.widget-mode {            background: transparent !important;            padding: 4px;        }
+        body.widget-mode #full-app-container,        body.widget-mode footer,        body.widget-mode .input-group,        body.widget-mode .delete-btn {            display: none !important;        }
+        body.widget-mode .widget-header-mini {            display: flex;        }
+        body.widget-mode .container {            padding-bottom: 0px;        }
+        body.widget-mode section {            box-shadow: none;            border: 1px solid rgba(0,0,0,0.05);        }
+        /* Toast thông báo */        #toast {            position: fixed;            top: 20px;            left: 50%;            transform: translateX(-50%);            background: #10b981;            color: white;            padding: 8px 16px;            border-radius: 10px;            font-size: 11px;            font-weight: 800;            box-shadow: 0 4px 12px rgba(0,0,0,0.1);            display: none;            z-index: 1000;        }    </style></head><body>
+    <div id="toast">Thông báo</div>
+    <div class="container">        <!-- Chế độ Widget thu nhỏ -->        <div class="widget-header-mini">            <span class="widget-title-text">VỀ NHÀ - THU NHẬP THỤ ĐỘNG</span>            <button class="widget-exit-btn" onclick="exitWidgetMode()">Đầy đủ</button>        </div>
+        <!-- CHẾ ĐỘ THƯỜNG -->        <div id="full-app-container">            <!-- Tiêu đề -->            <header>                <p class="title-sub">Mục Tiêu Tối Thượng</p>                <h1>VỀ NHÀ</h1>                <div class="divider"></div>                <p class="title-sub-green">Mục Tiêu Tài Chính</p>                <h2>Thu Nhập Thụ Động</h2>            </header>
+            <!-- Thời gian thực nhỏ gọn -->            <div class="clock-bar">                <div class="clock-left">                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>                    </svg>                    <span id="current-date">Đang tải...</span>                    <span>|</span>                    <span id="current-time" class="clock-time">00:00:00</span>                </div>                <span class="clock-right-badge">Offline</span>            </div>        </div>
+        <!-- Eisenhower Matrix Container -->        <main>            <!-- 1. QUAN TRỌNG & KHẨN CẤP (Q1 - ĐỎ RỰC RỠ, NẰM TRÊN CÙNG) -->            <section id="section-q1">                <div class="section-header">                    <div class="header-title-box">                        <div class="header-icon-wrapper">                            <svg class="w-4 h-4" style="width:16px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>                            </svg>                        </div>                        <div class="header-text-box">                            <h3>QUAN TRỌNG - KHẨN CẤP</h3>                            <p>Làm ngay lập tức</p>                        </div>                    </div>                    <span class="counter-badge" id="count-q1">0/0</span>                </div>                <div class="section-content">                    <div class="input-group" id="input-container-q1">                        <input type="text" id="input-q1" placeholder="Thêm việc khẩn cấp...">                        <button onclick="addTask('q1')">                            <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>                            </svg>                        </button>                    </div>                    <ul class="task-list" id="list-q1"></ul>                </div>            </section>
+            <!-- 2. QUAN TRỌNG & KHÔNG KHẨN CẤP (Q2 - XANH LỤC BẢO) -->            <section id="section-q2">                <div class="section-header">                    <div class="header-title-box">                        <div class="header-icon-wrapper">                            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>                            </svg>                        </div>                        <div class="header-text-box">                            <h3>QUAN TRỌNG - KHÔNG KHẨN CẤP</h3>                            <p>Rèn luyện hàng ngày</p>                        </div>                    </div>                    <span class="counter-badge" id="count-q2">0/10</span>                </div>                <div class="section-content">                    <div class="input-group" id="input-container-q2">                        <input type="text" id="input-q2" placeholder="Thêm việc rèn luyện dài hạn...">                        <button onclick="addTask('q2')">                            <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>                            </svg>                        </button>                    </div>                    <ul class="task-list" id="list-q2"></ul>                </div>            </section>        </main>    </div>
+    <!-- Chân trang điều khiển -->    <footer id="footer-controls">        <button class="footer-btn footer-btn-widget" onclick="enterWidgetMode()">            <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>            </svg>            Chế độ Widget        </button>        <button class="footer-btn footer-btn-reset" onclick="resetToDefaultState()">            <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18"></path>            </svg>            Đặt lại ngày        </button>    </footer>
+    <script>        // Tạo ID duy nhất chạy độc lập ngoại tuyến        function generateUniqueId() {            return 'task-' + Math.random().toString(36).substring(2, 9) + '-' + Date.now().toString(36);        }
+        // 10 bài rèn luyện mặc định của Q2        const defaultQ2Tasks = [            "Quán Âm 3 tiếng",            "Phụng sự 30'",            "Luyện hơi - Luyện thanh",            "DC xoang",            "DC suy thận",            "DC tổ đĩa",            "DC tỳ - ổ bụng",            "Khai khớp",            "Giải cơ",            "Thông kinh"        ];
+        let state = {            last_date: getTodayDateString(),            q1: [],            q2: defaultQ2Tasks.map(title => ({ id: generateUniqueId(), title, done: false }))        };
+        function getTodayDateString() {            const now = new Date();            const year = now.getFullYear();            const month = String(now.getMonth() + 1).padStart(2, '0');            const date = String(now.getDate()).padStart(2, '0');            return year + '-' + month + '-' + date;        }
+        // Tải trạng thái lưu trữ an toàn chống treo        function loadState() {            try {                const saved = localStorage.getItem('eisenhower_tasks');                const todayStr = getTodayDateString();                if (saved) {                    const parsed = JSON.parse(saved);                    // Tự động kiểm tra để dọn dẹp ngày cũ                    if (parsed.last_date !== todayStr) {                        resetToDefaultState();                    } else {                        state = parsed;                    }                } else {                    resetToDefaultState();                }            } catch (e) {                console.warn("LocalStorage bị chặn, lưu trên RAM tạm thời.");            }        }
+        function saveState() {            try {                state.last_date = getTodayDateString();                localStorage.setItem('eisenhower_tasks', JSON.stringify(state));            } catch (e) {                console.warn("Không thể lưu LocalStorage.");            }        }
+        function resetToDefaultState() {            state = {                last_date: getTodayDateString(),                q1: [],                q2: defaultQ2Tasks.map(title => ({ id: generateUniqueId(), title, done: false }))            };            saveState();            render();        }
+        // Render Giao diện danh sách        function render() {            renderQuadrant('q1', 'list-q1', 'count-q1');            renderQuadrant('q2', 'list-q2', 'count-q2');        }
+        function renderQuadrant(quadKey, listId, countId) {            const listEl = document.getElementById(listId);            const countEl = document.getElementById(countId);            const items = state[quadKey] || [];                        const doneCount = items.filter(function(i) { return i.done; }).length;            countEl.textContent = doneCount + '/' + items.length;
+            if (items.length === 0) {                listEl.innerHTML = '<li style="text-align: center; py: 12px; font-size: 11px; color: #94a3b8; font-style: italic; padding: 12px; background: #fafafa; border-radius: 10px; border: 1px solid #f1f5f9;">Không có nhiệm vụ nào.</li>';                return;            }
+            listEl.innerHTML = items.map(function(item) {                const doneClass = item.done ? 'done' : '';                const checkedAttr = item.done ? 'checked' : '';                return '<li class="task-item">' +                    '<label class="task-label">' +                        '<input type="checkbox" ' + checkedAttr + ' onchange="toggleTask(\'' + quadKey + '\', \'' + item.id + '\')" class="task-checkbox">' +                        '<span class="task-text ' + doneClass + '">' + item.title + '</span>' +                    '</label>' +                    '<button onclick="deleteTask(\'' + quadKey + '\', \'' + item.id + '\')" class="delete-btn">' +                        '<svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>' +                        '</svg>' +                    '</button>' +                '</li>';            }).join('');        }
+        // Tích chọn nhiệm vụ        window.toggleTask = function(quadKey, id) {            const task = state[quadKey].find(function(item) { return item.id === id; });            if (task) {                task.done = !task.done;                saveState();                render();            }        }
+        // Thêm nhiệm vụ phát sinh mới        window.addTask = function(quadKey) {            const inputEl = document.getElementById('input-' + quadKey);            const title = inputEl.value.trim();            if (!title) return;
+            state[quadKey].push({                id: generateUniqueId(),                title: title,                done: false            });
+            inputEl.value = '';            saveState();            render();            showToast("Đã thêm rèn luyện!");        }
+        // Xoá nhiệm vụ rèn luyện        window.deleteTask = function(quadKey, id) {            state[quadKey] = state[quadKey].filter(function(item) { return item.id !== id; });            saveState();            render();            showToast("Đã xoá rèn luyện.");        }
+        // Đồng hồ cập nhật thời gian thực tế không trễ        function updateClock() {            const now = new Date();                        const hours = String(now.getHours()).padStart(2, '0');            const minutes = String(now.getMinutes()).padStart(2, '0');            const seconds = String(now.getSeconds()).padStart(2, '0');                        const clockEl = document.getElementById('current-time');            if (clockEl) clockEl.textContent = hours + ':' + minutes + ':' + seconds;
+            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];            const dayName = days[now.getDay()];            const date = String(now.getDate()).padStart(2, '0');            const month = String(now.getMonth() + 1).padStart(2, '0');                        const dateEl = document.getElementById('current-date');            if (dateEl) dateEl.textContent = dayName + ', ' + date + '/' + month;
+            // Tự động kiểm tra reset qua ngày mới nếu điện thoại treo            const todayStr = getTodayDateString();            if (state.last_date && state.last_date !== todayStr) {                resetToDefaultState();                showToast("Bắt đầu ngày rèn luyện mới!");            }        }
+        // Kích hoạt chế độ Widget trong suốt        window.enterWidgetMode = function() {            document.body.classList.add('widget-mode');            localStorage.setItem('widget_mode_active', 'true');        }
+        window.exitWidgetMode = function() {            document.body.classList.remove('widget-mode');            localStorage.removeItem('widget_mode_active');        }
+        // Toast thông báo        function showToast(message) {            const toast = document.getElementById('toast');            if (toast) {                toast.textContent = message;                toast.style.display = 'block';                setTimeout(function() {                    toast.style.display = 'none';                }, 2000);            }        }
+        // Khởi động        window.onload = function() {            updateClock();            setInterval(updateClock, 1000);            loadState();
+            if (localStorage.getItem('widget_mode_active') === 'true') {                enterWidgetMode();            }            render();        };    </script></body></html>
+```
