@@ -15,15 +15,113 @@
         .input-unit { position: relative; display: flex; align-items: center; }
         .input-unit input { width: 100%; padding: 8px 20px 8px 10px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; text-align: center; }
         .input-unit span { position: absolute; right: 8px; color: #94a3b8; font-size: 12px; pointer-events: none; }
-        .task-item { border-bottom: 1px solid #f8fafc; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        .task-item .task-content { flex: 1; min-width: 0; }
-        .task-item .task-actions { display: flex; gap: 12px; min-width: 84px; justify-content: flex-end; }
-        .setting-label { font-size: 0.6rem; font-weight: 700; color: #64748b; margin-bottom: 0.25rem; text-transform: uppercase; text-align: center; display: block; }
+        .task-item { 
+            border-bottom: 1px solid #e2e8f0; 
+            padding: 8px 0; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            cursor: grab; 
+            user-select: none; 
+            transition: background 0.2s; 
+        }
+        .task-item:last-child { border-bottom: none; }
+        .task-item:active { cursor: grabbing; }
+        .task-item.dragging { opacity: 0.5; background: #f1f5f9; }
+        .task-item.drag-over { border-top: 2px solid #6366f1; }
+        .task-item .task-content { 
+            flex: 1; 
+            min-width: 0; 
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .task-item .task-actions { 
+            display: flex; 
+            gap: 0;
+            min-width: 84px; 
+            justify-content: flex-end; 
+            align-items: center; 
+            flex-shrink: 0;
+        }
+        .task-item .drag-handle { cursor: grab; padding: 2px 4px; color: #cbd5e1; font-size: 0.8rem; margin-right: 4px; flex-shrink: 0; width: 20px; text-align: center; }
+        .setting-label { font-size: 0.55rem; font-weight: 700; color: #64748b; margin-bottom: 0.15rem; text-transform: uppercase; text-align: center; display: block; }
         .setting-container { position: relative; display: flex; align-items: center; width: 100%; }
-        .setting-input { width: 100%; padding: 4px 18px 4px 6px; font-size: 0.7rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; text-align: center; box-sizing: border-box; }
-        .setting-unit { position: absolute; right: 6px; color: #94a3b8; font-size: 0.7rem; pointer-events: none; }
-        .action-icon { cursor: pointer; padding: 4px; transition: transform 0.2s; display: inline-block; }
+        .setting-input { width: 100%; padding: 3px 14px 3px 4px; font-size: 0.6rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; text-align: center; box-sizing: border-box; }
+        .setting-unit { position: absolute; right: 4px; color: #94a3b8; font-size: 0.6rem; pointer-events: none; }
+        .action-icon { 
+            cursor: pointer; 
+            padding: 0; 
+            transition: transform 0.2s; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 0.9rem; 
+            width: 28px; 
+            height: 28px; 
+            flex-shrink: 0;
+            line-height: 1;
+        }
         .action-icon:hover { transform: scale(1.2); }
+        
+        .file-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .file-input-button {
+            width: 100%;
+            padding: 3px 4px;
+            font-size: 0.6rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            text-align: center;
+            box-sizing: border-box;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .file-name {
+            font-size: 0.5rem;
+            color: #64748b;
+            margin-top: 1px;
+            text-align: center;
+            word-break: break-all;
+            line-height: 1;
+        }
+        
+        .task-time-input {
+            width: 36px;
+            padding: 1px 2px;
+            font-size: 0.6rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+            text-align: center;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+        
+        .task-time-label {
+            font-size: 9px;
+            color: #94a3b8;
+            flex-shrink: 0;
+            margin: 0 1px;
+        }
         
         @keyframes gold-glow {
             0%, 100% { text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 10px #fbbf24, 0 0 20px #fbbf24, 0 0 30px #d97706; opacity: 1; }
@@ -38,27 +136,24 @@
             filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
         }
         
-        /* Style cho số đếm ngược trong giao diện chờ - 80% của vòng tròn */
         .countdown-number {
             font-size: 3rem !important;
             line-height: 1;
         }
         
-        /* Style cho input giờ và phút nhỏ - đồng bộ với setting-input */
         .time-small-input {
             width: 100%;
-            padding: 4px 2px;
-            font-size: 0.65rem;
+            padding: 3px 1px;
+            font-size: 0.6rem;
             border: 1px solid #e2e8f0;
-            border-radius: 0.375rem;
+            border-radius: 0.25rem;
             text-align: center;
             box-sizing: border-box;
         }
         
-        /* Container cho GIỜ BẮT ĐẦU để đồng bộ với các ô khác */
         .time-start-container {
             display: flex;
-            gap: 2px;
+            gap: 1px;
             align-items: center;
             width: 100%;
         }
@@ -68,35 +163,118 @@
             min-width: 0;
         }
         
-        /* Style cho ô hiển thị tiến độ nhiệm vụ */
         .progress-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 48px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            min-width: 40px;
+            padding: 3px 8px;
+            border-radius: 16px;
+            font-size: 0.7rem;
             font-weight: 700;
             font-family: monospace;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
+        }
+        
+        .time-remaining-box {
+            padding: 0.5rem !important;
+        }
+        .time-remaining-text {
+            font-size: 0.5rem !important;
+        }
+        .time-remaining-number {
+            font-size: 1.5rem !important;
+        }
+        
+        .settings-grid {
+            gap: 0.5rem !important;
+            margin-top: 0.75rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        .compact-header {
+            margin-bottom: 1.5rem !important;
+        }
+        
+        .compact-card {
+            padding: 0.75rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        .compact-button {
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Style cho icon Quán Âm trong Flow UI */
+        .quanam-sub-icon {
+            cursor: pointer;
+            padding: 3px 5px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            min-width: 30px;
+        }
+        .quanam-sub-icon.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+        .quanam-sub-icon .icon-emoji {
+            font-size: 0.8rem;
+        }
+        .quanam-sub-timer {
+            font-size: 0.5rem;
+            font-weight: 700;
+            font-family: monospace;
+        }
+        
+        /* Khu vực Quán Âm sub-icons dưới tên */
+        .quanam-sub-container {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 2px;
+        }
+        
+        /* Style cho dấu V màu xanh */
+        .check-mark-green {
+            color: #10b981;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        /* Căn giữa số trong ô input cho cột 🧘 và 🔔 */
+        .setting-container .setting-input {
+            text-align: center;
+            padding: 3px 4px !important;
+        }
+        .setting-container .setting-unit {
+            right: 6px;
         }
     </style>
 </head>
-<body class="pb-10 pt-4">
+<body class="pb-6 pt-2">
 
     <div class="max-w-md mx-auto px-4" id="main-ui">
-        <header class="flex flex-col mb-8 text-center">
-            <div class="grid grid-cols-4 gap-2 mt-4 mb-4">
+        <header class="flex flex-col compact-header text-center">
+            <div class="grid grid-cols-4 settings-grid">
                 <div>
                     <label class="setting-label">🎵</label>
-                    <input type="file" id="ringtone-upload" accept="audio/mp3" class="setting-input file:py-0 file:px-1 file:text-[8px] text-[8px]" onchange="handleAudioUpload(event)">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="ringtone-upload" accept="audio/*, .mp3, .mpeg, .wav, .ogg, .aac, .m4a" onchange="handleAudioUpload(event)" capture>
+                        <div class="file-input-button">
+                            📁 <span id="file-button-text">Chọn</span>
+                        </div>
+                    </div>
+                    <div id="file-name-display" class="file-name"></div>
                 </div>
                 <div>
                     <label class="setting-label">GIỜ BẮT ĐẦU</label>
                     <div class="time-start-container">
                         <input type="number" id="start-hour" value="21" min="0" max="23" onchange="calculateTime()" class="time-small-input">
-                        <span class="text-[10px] text-slate-400">:</span>
+                        <span class="text-[8px] text-slate-400">:</span>
                         <input type="number" id="start-minute" value="0" min="0" max="59" onchange="calculateTime()" class="time-small-input">
                     </div>
                 </div>
@@ -115,62 +293,57 @@
                     </div>
                 </div>
             </div>
-            <button onclick="startFullFlow()" class="w-full bg-indigo-600 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition mb-4">BẮT ĐẦU</button>
+            <button onclick="startFullFlow()" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition compact-button text-sm">BẮT ĐẦU</button>
             
-            <div class="bg-white border-2 border-indigo-50 p-4 rounded-2xl text-center shadow-sm">
-                <div class="text-[10px] uppercase font-bold text-slate-400">Thời gian còn lại trong ngày</div>
-                <div id="time-remaining" class="text-4xl font-mono font-black text-red-600">00:00:00</div>
+            <div class="bg-white border-2 border-indigo-50 time-remaining-box rounded-2xl text-center shadow-sm">
+                <div class="time-remaining-text uppercase font-bold text-slate-400">Thời gian còn lại trong ngày</div>
+                <div id="time-remaining" class="time-remaining-number font-mono font-black text-red-600">00:00:00</div>
             </div>
         </header>
 
-        <section class="task-card p-5 mb-5 border-l-8 border-red-500">
-            <h3 class="font-bold text-slate-700 mb-4 text-lg flex items-center justify-center gap-2">🔥 ⭐</h3>
-            <div class="space-y-3">
-                <input type="text" id="task-q1" placeholder="Nhiệm vụ..." class="w-full p-3 border rounded-xl text-sm">
-                <div class="flex gap-2">
+        <section class="task-card compact-card border-l-8 border-red-500">
+            <h3 class="font-bold text-slate-700 mb-3 text-base flex items-center justify-center gap-1">🔥 ⭐⭐⭐⭐⭐</h3>
+            <div class="space-y-2">
+                <input type="text" id="task-q1" placeholder="Khẩn Cấp - Quan Trọng" class="w-full p-2 border rounded-xl text-sm" oninput="autoCapitalize(this)">
+                <div class="flex gap-1.5">
                     <div class="input-unit w-1/4"><input type="number" id="h-q1" placeholder="0" min="0"><span>h</span></div>
                     <div class="input-unit w-1/4"><input type="number" id="m-q1" placeholder="0" min="0" max="59"><span>'</span></div>
                     <div class="input-unit w-1/4"><input type="number" id="s-q1" placeholder="0" min="0" max="59"><span>s</span></div>
-                    <button onclick="addTask('q1')" class="w-1/4 bg-red-500 text-white rounded-xl font-bold text-sm">Thêm</button>
+                    <button onclick="addTask('q1')" class="w-1/4 bg-red-500 text-white rounded-xl font-bold text-xs">Thêm</button>
                 </div>
             </div>
-            <ul id="list-q1" class="mt-4"></ul>
+            <ul id="list-q1" class="mt-3"></ul>
         </section>
 
-        <section class="task-card p-5 border-l-8 border-emerald-500">
-            <h3 class="font-bold text-slate-700 mb-4 text-lg flex items-center justify-center gap-1">⭐⭐⭐⭐⭐</h3>
-            <div class="space-y-3">
-                <input type="text" id="task-q2" placeholder="Thói quen..." class="w-full p-3 border rounded-xl text-sm">
-                <div class="flex gap-2">
+        <section class="task-card compact-card border-l-8 border-emerald-500">
+            <h3 class="font-bold text-slate-700 mb-3 text-base flex items-center justify-center gap-1">⭐⭐⭐⭐⭐</h3>
+            <div class="space-y-2">
+                <input type="text" id="task-q2" placeholder="Thói Quen Quan Trọng" class="w-full p-2 border rounded-xl text-sm" oninput="autoCapitalize(this)">
+                <div class="flex gap-1.5">
                     <div class="input-unit w-1/4"><input type="number" id="h-q2" placeholder="0" min="0"><span>h</span></div>
                     <div class="input-unit w-1/4"><input type="number" id="m-q2" placeholder="0" min="0" max="59"><span>'</span></div>
                     <div class="input-unit w-1/4"><input type="number" id="s-q2" placeholder="0" min="0" max="59"><span>s</span></div>
-                    <button onclick="addTask('q2')" class="w-1/4 bg-emerald-500 text-white rounded-xl font-bold text-sm">Thêm</button>
+                    <button onclick="addTask('q2')" class="w-1/4 bg-emerald-500 text-white rounded-xl font-bold text-xs">Thêm</button>
                 </div>
             </div>
-            <ul id="list-q2" class="mt-4"></ul>
+            <ul id="list-q2" class="mt-3"></ul>
         </section>
     </div>
 
-    <!-- Giao diện Flow (đếm ngược nhiệm vụ) -->
+    <!-- Giao diện Flow -->
     <div id="flow-ui" class="hidden fixed inset-0 bg-[#5d4037] text-amber-50 p-6 flex flex-col items-center justify-center z-50">
-        <div class="text-center mb-4">
+        <div class="text-center mb-3">
             <h1 class="text-5xl font-serif italic font-bold gold-metallic">Về Nhà</h1>
             <div class="text-sm text-teal-300 font-semibold mt-1">💸 Thu Nhập Thụ Động</div>
             <p class="text-[8px] md:text-[10px] text-stone-300 italic mt-1 uppercase tracking-tight whitespace-nowrap">💼 Massage Trị Liệu • 🎵 Hát Dân Ca & Bolero • ✍️ Sáng Tác Nhạc</p>
         </div>
 
-        <!-- Ô hiển thị tiến độ nhiệm vụ -->
-        <div class="flex gap-3 mb-4">
-            <div id="progress-q1" class="progress-badge bg-red-500/20 text-red-300 border border-red-500/50">
-                🔥 0/0
-            </div>
-            <div id="progress-q2" class="progress-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/50">
-                ⭐ 0/0
-            </div>
+        <div class="flex gap-3 mb-3">
+            <div id="progress-q1" class="progress-badge bg-red-500/20 text-red-300 border border-red-500/50">🔥 0/0</div>
+            <div id="progress-q2" class="progress-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/50">⭐ 0/0</div>
         </div>
 
-        <div class="w-full max-w-xs mb-4 px-4 bg-[#4e342e] p-3 rounded-2xl border border-[#8d6e63]/30 shadow-md">
+        <div class="w-full max-w-xs mb-3 px-4 bg-[#4e342e] p-3 rounded-2xl border border-[#8d6e63]/30 shadow-md">
             <div class="flex justify-between text-xs text-stone-300 font-bold mb-1.5 uppercase tracking-wider items-center">
                 <span>⏳</span>
                 <span id="flow-cycle-remaining" class="font-mono text-amber-400">00:00:00</span>
@@ -180,18 +353,28 @@
             </div>
         </div>
 
-        <div id="display-container" class="mb-6 w-full max-w-sm flex items-center justify-center px-4">
+        <div id="display-container" class="mb-4 w-full max-w-sm flex flex-col items-center justify-center px-4">
             <h2 id="display-name" class="font-black uppercase tracking-widest text-center text-4xl leading-tight gold-shimmer">Đang tải...</h2>
+            <!-- Khu vực icon phụ cho Quán Âm - đặt dưới tên -->
+            <div id="quanam-sub-icons" class="hidden quanam-sub-container">
+                <div id="quanam-sun-icon" class="quanam-sub-icon bg-yellow-500/20 text-yellow-300 border border-yellow-500/50" onclick="toggleQuanAmSubTimer('sun')">
+                    <span class="icon-emoji">☀️</span>
+                    <span id="quanam-sun-timer" class="quanam-sub-timer">00:00:00</span>
+                </div>
+                <div id="quanam-speaker-icon" class="quanam-sub-icon bg-blue-500/20 text-blue-300 border border-blue-500/50" onclick="toggleQuanAmSubTimer('speaker')">
+                    <span class="icon-emoji">🔊</span>
+                    <span id="quanam-speaker-timer" class="quanam-sub-timer">00:00:00</span>
+                </div>
+            </div>
         </div>
         
-        <div class="w-72 h-72 border-[8px] border-[#fbbf24] rounded-full flex items-center justify-center mb-8 bg-[#6d4c41] shadow-[inset_0_4px_6px_rgba(255,255,255,0.3),0_10px_15px_rgba(0,0,0,0.4)]">
-            <div id="display-task" class="text-5xl font-extrabold text-amber-100 font-mono tracking-tighter">00:00:00</div>
+        <div class="w-64 h-64 border-[8px] border-[#fbbf24] rounded-full flex items-center justify-center mb-6 bg-[#6d4c41] shadow-[inset_0_4px_6px_rgba(255,255,255,0.3),0_10px_15px_rgba(0,0,0,0.4)]">
+            <div id="display-task" class="text-4xl font-extrabold text-amber-100 font-mono tracking-tighter">00:00:00</div>
         </div>
         
         <button class="w-48 bg-emerald-600 hover:bg-emerald-700 transition text-white border border-emerald-400 p-3 rounded-2xl font-bold shadow-lg" onclick="skipTask()">BỎ QUA NV</button>
     </div>
 
-    <!-- Giao diện đếm ngược -->
     <div id="countdown-ui" class="hidden fixed inset-0 bg-gradient-to-b from-[#1a237e] to-[#0d47a1] text-white p-6 flex flex-col items-center justify-center z-50">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold mb-2">⏰ Cài Đặt Nhiệm Vụ</h1>
@@ -204,16 +387,10 @@
         
         <p id="countdown-status" class="text-blue-200 text-sm mb-8">Đang chờ đến giờ bắt đầu...</p>
         
-        <button onclick="goToSetupTasks()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-8 py-3 rounded-xl font-bold shadow-lg transition mb-4">
-            📋 Cài đặt nhiệm vụ
-        </button>
-        
-        <button onclick="cancelCountdown()" class="text-blue-300 hover:text-white text-sm font-semibold transition">
-            Quay lại
-        </button>
+        <button onclick="goToSetupTasks()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-8 py-3 rounded-xl font-bold shadow-lg transition mb-4">📋 Cài đặt nhiệm vụ</button>
+        <button onclick="cancelCountdown()" class="text-blue-300 hover:text-white text-sm font-semibold transition">Quay lại</button>
     </div>
 
-    <!-- Time Picker Modal -->
     <div id="time-picker-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[60]">
         <div class="bg-white p-6 rounded-2xl w-80 text-center shadow-2xl mx-4">
             <h4 class="font-bold text-slate-800 mb-2 text-sm uppercase tracking-wider">⏱️ CÀI ĐẶT GIỜ CỐ ĐỊNH</h4>
@@ -237,7 +414,6 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div id="custom-toast" class="hidden fixed bottom-5 right-5 left-5 md:left-auto md:w-80 bg-slate-900 text-white p-4 rounded-xl shadow-2xl z-50 transition-all duration-300 transform translate-y-10 opacity-0">
         <div class="flex items-center gap-2">
             <span id="toast-icon">ℹ️</span>
@@ -249,12 +425,31 @@
 
     <script>
         const SETUP_TASK_ID = 'setup-task-fixed';
+        const GIAOLY_TASK_ID = 'giaoly-task-fixed';
+        const QUANAM_TASK_ID = 'quanam-task-fixed';
+        const STORAGE_DATE_KEY = 'lastCleanupDate';
         
         let timerInterval = null;
         let countdownInterval = null;
         let flowQueue = [];
         let completedTasks = { q1: 0, q2: 0 };
         let totalTasks = { q1: 0, q2: 0 };
+        
+        let quanamSubActive = null;
+        let quanamSubInterval = null;
+        let quanamSunTimeLeft = 0;
+        let quanamSpeakerTimeLeft = 0;
+        let quanamSunTotal = 0;
+        let quanamSpeakerTotal = 0;
+        // Biến theo dõi trạng thái đã bấm của từng sub-icon
+        let quanamSunStarted = false;
+        let quanamSpeakerStarted = false;
+        // Biến lưu tổng thời gian cho nhiệm vụ Quán Âm
+        let quanamTotalTime = 0;
+        
+        // Biến cho kéo thả
+        let draggedItem = null;
+        let draggedQuad = null;
         
         const audioPlayer = document.getElementById('audio-player');
 
@@ -268,10 +463,20 @@
         let currentTask = null;
         let currentTimerTimeLeft = 0;
         let lastTriggeredFixedMinute = "";
+        
+        // Biến theo dõi trạng thái file âm thanh
+        let hasAudioFile = false;
 
         const DB_NAME = "RingtoneStorageDB";
         const STORE_NAME = "sounds";
         const DB_VERSION = 1;
+
+        // Hàm tự động in hoa ký tự đầu
+        function autoCapitalize(input) {
+            if (input.value.length > 0) {
+                input.value = input.value.charAt(0).toUpperCase() + input.value.slice(1);
+            }
+        }
 
         function initIndexedDB() {
             return new Promise((resolve, reject) => {
@@ -318,6 +523,193 @@
             }
         }
 
+        function updateAudioButtonDisplay() {
+            const buttonText = document.getElementById('file-button-text');
+            if (hasAudioFile) {
+                buttonText.innerHTML = '<span class="check-mark-green">✓</span>';
+            } else {
+                buttonText.textContent = 'Chọn';
+            }
+        }
+
+        function getTodayDateString() {
+            const now = new Date();
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        }
+
+        // Hàm kéo thả
+        function initDragAndDrop(listId) {
+            const list = document.getElementById(listId);
+            if (!list) return;
+            
+            const items = list.querySelectorAll('.task-item[draggable="true"]');
+            items.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+                item.addEventListener('dragover', handleDragOver);
+                item.addEventListener('dragenter', handleDragEnter);
+                item.addEventListener('dragleave', handleDragLeave);
+                item.addEventListener('drop', handleDrop);
+            });
+        }
+        
+        function handleDragStart(e) {
+            draggedItem = this;
+            draggedQuad = this.dataset.quad;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+        }
+        
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.task-item.drag-over').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+            draggedItem = null;
+            draggedQuad = null;
+            calculateTime();
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+        
+        function handleDragEnter(e) {
+            e.preventDefault();
+            if (this !== draggedItem && this.dataset.quad === draggedQuad) {
+                this.classList.add('drag-over');
+            }
+        }
+        
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            if (this !== draggedItem && this.dataset.quad === draggedQuad) {
+                this.classList.remove('drag-over');
+                
+                const list = this.parentNode;
+                const allItems = Array.from(list.querySelectorAll('.task-item[draggable="true"]'));
+                const fromIndex = allItems.indexOf(draggedItem);
+                const toIndex = allItems.indexOf(this);
+                
+                if (fromIndex < toIndex) {
+                    list.insertBefore(draggedItem, this.nextSibling);
+                } else {
+                    list.insertBefore(draggedItem, this);
+                }
+                
+                // Lưu thứ tự mới
+                saveTaskOrder(draggedQuad);
+                showToast("Đã thay đổi thứ tự ưu tiên!", "↕️");
+            }
+            
+            return false;
+        }
+        
+        function saveTaskOrder(quad) {
+            const list = document.getElementById('list-' + quad);
+            if (!list) return;
+            
+            const items = list.querySelectorAll('.task-item[draggable="true"]');
+            const order = Array.from(items).map(item => item.dataset.id);
+            
+            // Lưu vào localStorage
+            localStorage.setItem('taskOrder-' + quad, JSON.stringify(order));
+        }
+        
+        function loadTaskOrder(quad) {
+            const saved = localStorage.getItem('taskOrder-' + quad);
+            if (!saved) return null;
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                return null;
+            }
+        }
+        
+        function sortTasksByOrder(quad) {
+            const list = document.getElementById('list-' + quad);
+            if (!list) return;
+            
+            const order = loadTaskOrder(quad);
+            if (!order || order.length === 0) return;
+            
+            const items = Array.from(list.querySelectorAll('.task-item[draggable="true"]'));
+            if (items.length === 0) return;
+            
+            // Sắp xếp theo order đã lưu
+            const itemMap = {};
+            items.forEach(item => {
+                itemMap[item.dataset.id] = item;
+            });
+            
+            // Xóa hết
+            items.forEach(item => item.remove());
+            
+            // Thêm lại theo thứ tự
+            order.forEach(id => {
+                if (itemMap[id]) {
+                    list.appendChild(itemMap[id]);
+                }
+            });
+            
+            // Thêm các item mới không có trong order vào cuối
+            items.forEach(item => {
+                if (!order.includes(item.dataset.id) && !item.parentNode) {
+                    list.appendChild(item);
+                }
+            });
+        }
+
+        async function cleanupOldTasks() {
+            const today = getTodayDateString();
+            const lastCleanup = localStorage.getItem(STORAGE_DATE_KEY);
+            
+            if (lastCleanup === today) {
+                return;
+            }
+            
+            console.log("Đang dọn dẹp nhiệm vụ cũ...");
+            
+            if (currentUser && db) {
+                try {
+                    const path = `artifacts/${appId}/users/${currentUser.uid}/tasks`;
+                    const snapshot = await db.collection(path).get();
+                    
+                    const batch = db.batch();
+                    let hasChanges = false;
+                    
+                    snapshot.forEach(doc => {
+                        const task = doc.data();
+                        if (doc.id !== SETUP_TASK_ID && doc.id !== GIAOLY_TASK_ID && doc.id !== QUANAM_TASK_ID && !task.saved && !task.isSetupTask) {
+                            batch.delete(doc.ref);
+                            hasChanges = true;
+                        }
+                    });
+                    
+                    if (hasChanges) {
+                        await batch.commit();
+                    }
+                } catch (e) {
+                    console.error("Lỗi khi dọn dẹp Firestore:", e);
+                }
+            }
+            
+            inMemoryTasks = inMemoryTasks.filter(task => 
+                task.id === SETUP_TASK_ID || task.id === GIAOLY_TASK_ID || task.id === QUANAM_TASK_ID || task.saved || task.isSetupTask
+            );
+            
+            localStorage.setItem(STORAGE_DATE_KEY, today);
+        }
+
         function ensureSetupTask() {
             const listQ1 = document.getElementById('list-q1');
             if (!document.getElementById(SETUP_TASK_ID)) {
@@ -330,16 +722,216 @@
                 li.dataset.title = "Cài đặt nhiệm vụ";
                 li.dataset.fixedTime = "";
                 li.dataset.isSetupTask = "true";
+                li.dataset.saved = "true";
                 
                 li.innerHTML = `
+                    <span class="drag-handle" style="visibility: hidden;">⋮⋮</span>
                     <span class="task-content text-red-600 font-medium">Cài đặt nhiệm vụ<span class="fixed-time-label text-indigo-500 font-mono text-[11px]"></span></span>
                     <div class="task-actions">
                         <span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${SETUP_TASK_ID}')">🕒</span>
                         <span class="action-icon star-icon text-amber-500">★</span>
+                        <span class="action-icon" style="visibility: hidden;">🗑️</span>
                     </div>`;
                 
                 listQ1.insertBefore(li, listQ1.firstChild);
                 saveSetupTaskToStorage();
+            }
+        }
+        
+        function ensureGiaoLyTask() {
+            const listQ1 = document.getElementById('list-q1');
+            if (!document.getElementById(GIAOLY_TASK_ID)) {
+                const li = document.createElement('li');
+                li.className = "task-item text-sm";
+                li.id = GIAOLY_TASK_ID;
+                li.dataset.id = GIAOLY_TASK_ID;
+                li.dataset.seconds = "0";
+                li.dataset.quad = "q1";
+                li.dataset.title = "GIÁO LÝ 30'";
+                li.dataset.fixedTime = "";
+                li.dataset.isSetupTask = "true";
+                li.dataset.saved = "true";
+                li.dataset.giaolyMinutes = "0";
+                
+                li.innerHTML = `
+                    <span class="drag-handle" style="visibility: hidden;">⋮⋮</span>
+                    <span class="task-content text-sky-600 font-medium text-xs">
+                        GIÁO LÝ 30' 
+                        <small class="text-slate-400 ml-1 font-mono text-[11px] giaoly-display">00:00:00</small>
+                        <span class="fixed-time-label text-indigo-500 font-mono text-[11px]"></span>
+                    </span>
+                    <div class="task-actions" style="min-width: 108px;">
+                        <input type="number" class="task-time-input" id="giaoly-minutes" value="0" min="0" max="120" placeholder="m" onchange="updateGiaoLyTime()">
+                        <span class="task-time-label">m</span>
+                        <span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${GIAOLY_TASK_ID}')">🕒</span>
+                        <span class="action-icon star-icon text-amber-500">★</span>
+                        <span class="action-icon" style="visibility: hidden;">🗑️</span>
+                    </div>`;
+                
+                const setupTask = document.getElementById(SETUP_TASK_ID);
+                if (setupTask && setupTask.nextSibling) {
+                    listQ1.insertBefore(li, setupTask.nextSibling);
+                } else {
+                    listQ1.appendChild(li);
+                }
+                
+                saveGiaoLyTaskToStorage();
+            }
+        }
+        
+        function ensureQuanAmTask() {
+            const listQ1 = document.getElementById('list-q1');
+            if (!document.getElementById(QUANAM_TASK_ID)) {
+                const li = document.createElement('li');
+                li.className = "task-item text-sm";
+                li.id = QUANAM_TASK_ID;
+                li.dataset.id = QUANAM_TASK_ID;
+                li.dataset.seconds = "0";
+                li.dataset.quad = "q1";
+                li.dataset.title = "QUÁN ÂM 3H";
+                li.dataset.fixedTime = "";
+                li.dataset.isSetupTask = "true";
+                li.dataset.saved = "true";
+                li.dataset.quanamHours = "0";
+                li.dataset.quanamMinutes = "0";
+                
+                li.innerHTML = `
+                    <span class="drag-handle" style="visibility: hidden;">⋮⋮</span>
+                    <span class="task-content text-amber-600 font-medium text-xs">
+                        QUÁN ÂM 3H 
+                        <small class="text-slate-400 ml-1 font-mono text-[11px] quanam-display">00:00:00</small>
+                        <span class="fixed-time-label text-indigo-500 font-mono text-[11px]"></span>
+                    </span>
+                    <div class="task-actions" style="min-width: 148px;">
+                        <input type="number" class="task-time-input" id="quanam-hours" value="0" min="0" max="23" placeholder="h" onchange="updateQuanAmTime()">
+                        <span class="task-time-label">h</span>
+                        <input type="number" class="task-time-input" id="quanam-minutes" value="0" min="0" max="59" placeholder="m" onchange="updateQuanAmTime()">
+                        <span class="task-time-label">m</span>
+                        <span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${QUANAM_TASK_ID}')">🕒</span>
+                        <span class="action-icon star-icon text-amber-500">★</span>
+                        <span class="action-icon" style="visibility: hidden;">🗑️</span>
+                    </div>`;
+                
+                const giaoLyTask = document.getElementById(GIAOLY_TASK_ID);
+                if (giaoLyTask && giaoLyTask.nextSibling) {
+                    listQ1.insertBefore(li, giaoLyTask.nextSibling);
+                } else {
+                    listQ1.appendChild(li);
+                }
+                
+                saveQuanAmTaskToStorage();
+            }
+        }
+        
+        function updateGiaoLyTime() {
+            const minutes = parseInt(document.getElementById('giaoly-minutes').value) || 0;
+            const totalSeconds = minutes * 60;
+            
+            const item = document.getElementById(GIAOLY_TASK_ID);
+            if (item) {
+                item.dataset.seconds = totalSeconds;
+                item.dataset.giaolyMinutes = minutes;
+                
+                const display = item.querySelector('.giaoly-display');
+                if (display) {
+                    display.innerText = formatTime(totalSeconds);
+                }
+                
+                saveGiaoLyTaskToStorage();
+                calculateTime();
+            }
+        }
+        
+        async function saveGiaoLyTaskToStorage() {
+            const minutes = parseInt(document.getElementById('giaoly-minutes')?.value) || 0;
+            const totalSeconds = minutes * 60;
+            
+            const task = {
+                id: GIAOLY_TASK_ID,
+                title: "GIÁO LÝ 30'",
+                seconds: totalSeconds,
+                quad: "q1",
+                fixedTime: document.getElementById(GIAOLY_TASK_ID)?.dataset.fixedTime || "",
+                isSetupTask: true,
+                saved: true,
+                giaolyMinutes: minutes,
+                createdAt: getTodayDateString()
+            };
+            
+            if (currentUser && db) {
+                try {
+                    const docPath = `artifacts/${appId}/users/${currentUser.uid}/tasks/${GIAOLY_TASK_ID}`;
+                    await db.doc(docPath).set(task);
+                } catch (e) {
+                    console.error("Lỗi Firestore:", e);
+                }
+            } else {
+                const index = inMemoryTasks.findIndex(t => t.id === GIAOLY_TASK_ID);
+                if (index === -1) {
+                    inMemoryTasks.push(task);
+                } else {
+                    inMemoryTasks[index] = task;
+                }
+            }
+        }
+        
+        function updateQuanAmTime() {
+            const hours = parseInt(document.getElementById('quanam-hours').value) || 0;
+            const minutes = parseInt(document.getElementById('quanam-minutes').value) || 0;
+            
+            // Tổng thời gian = 2.5x thời gian cơ bản
+            const baseSeconds = hours * 3600 + minutes * 60;
+            const totalSeconds = Math.floor(baseSeconds * 2.5);
+            
+            const item = document.getElementById(QUANAM_TASK_ID);
+            if (item) {
+                item.dataset.seconds = totalSeconds;
+                item.dataset.quanamHours = hours;
+                item.dataset.quanamMinutes = minutes;
+                
+                const display = item.querySelector('.quanam-display');
+                if (display) {
+                    display.innerText = formatTime(totalSeconds);
+                }
+                
+                saveQuanAmTaskToStorage();
+                calculateTime();
+            }
+        }
+        
+        async function saveQuanAmTaskToStorage() {
+            const hours = parseInt(document.getElementById('quanam-hours')?.value) || 0;
+            const minutes = parseInt(document.getElementById('quanam-minutes')?.value) || 0;
+            const baseSeconds = hours * 3600 + minutes * 60;
+            const totalSeconds = Math.floor(baseSeconds * 2.5);
+            
+            const task = {
+                id: QUANAM_TASK_ID,
+                title: "QUÁN ÂM 3H",
+                seconds: totalSeconds,
+                quad: "q1",
+                fixedTime: document.getElementById(QUANAM_TASK_ID)?.dataset.fixedTime || "",
+                isSetupTask: true,
+                saved: true,
+                quanamHours: hours,
+                quanamMinutes: minutes,
+                createdAt: getTodayDateString()
+            };
+            
+            if (currentUser && db) {
+                try {
+                    const docPath = `artifacts/${appId}/users/${currentUser.uid}/tasks/${QUANAM_TASK_ID}`;
+                    await db.doc(docPath).set(task);
+                } catch (e) {
+                    console.error("Lỗi Firestore:", e);
+                }
+            } else {
+                const index = inMemoryTasks.findIndex(t => t.id === QUANAM_TASK_ID);
+                if (index === -1) {
+                    inMemoryTasks.push(task);
+                } else {
+                    inMemoryTasks[index] = task;
+                }
             }
         }
         
@@ -350,7 +942,9 @@
                 seconds: 0,
                 quad: "q1",
                 fixedTime: "",
-                isSetupTask: true
+                isSetupTask: true,
+                saved: true,
+                createdAt: getTodayDateString()
             };
             
             if (currentUser && db) {
@@ -364,20 +958,168 @@
                 const index = inMemoryTasks.findIndex(t => t.id === SETUP_TASK_ID);
                 if (index === -1) {
                     inMemoryTasks.push(task);
+                } else {
+                    inMemoryTasks[index] = task;
                 }
             }
+        }
+
+        function initQuanAmSubTimers() {
+            const quanamItem = document.getElementById(QUANAM_TASK_ID);
+            if (!quanamItem) return;
+            
+            const hours = parseInt(quanamItem.dataset.quanamHours) || 0;
+            const minutes = parseInt(quanamItem.dataset.quanamMinutes) || 0;
+            const baseSeconds = hours * 3600 + minutes * 60;
+            
+            // Thời gian cho từng sub-timer
+            quanamSunTotal = Math.floor(baseSeconds * 1.5); // ☀️ = 1.5 lần thời gian cơ bản
+            quanamSunTimeLeft = quanamSunTotal;
+            
+            quanamSpeakerTotal = baseSeconds; // 🔊 = thời gian cơ bản
+            quanamSpeakerTimeLeft = quanamSpeakerTotal;
+            
+            // Tổng thời gian cho đồng hồ chính = 2.5x thời gian cơ bản
+            quanamTotalTime = Math.floor(baseSeconds * 2.5);
+            
+            quanamSubActive = null;
+            quanamSunStarted = false;
+            quanamSpeakerStarted = false;
+            clearInterval(quanamSubInterval);
+            
+            updateQuanAmSubDisplay();
+        }
+        
+        function updateQuanAmSubDisplay() {
+            const sunTimer = document.getElementById('quanam-sun-timer');
+            const speakerTimer = document.getElementById('quanam-speaker-timer');
+            if (sunTimer) sunTimer.innerText = formatTime(quanamSunTimeLeft);
+            if (speakerTimer) speakerTimer.innerText = formatTime(quanamSpeakerTimeLeft);
+            
+            const sunIcon = document.getElementById('quanam-sun-icon');
+            const speakerIcon = document.getElementById('quanam-speaker-icon');
+            
+            if (sunIcon) sunIcon.classList.remove('active');
+            if (speakerIcon) speakerIcon.classList.remove('active');
+            
+            if (quanamSubActive === 'sun' && sunIcon) {
+                sunIcon.classList.add('active');
+            } else if (quanamSubActive === 'speaker' && speakerIcon) {
+                speakerIcon.classList.add('active');
+            }
+        }
+        
+        function toggleQuanAmSubTimer(type) {
+            // Nếu đang active type này thì tắt nó đi
+            if (quanamSubActive === type) {
+                clearInterval(quanamSubInterval);
+                quanamSubActive = null;
+                updateQuanAmSubDisplay();
+                return;
+            }
+            
+            // Nếu type khác đang chạy thì dừng type cũ
+            clearInterval(quanamSubInterval);
+            
+            // Bắt đầu type mới
+            quanamSubActive = type;
+            if (type === 'sun') {
+                quanamSunStarted = true;
+            } else if (type === 'speaker') {
+                quanamSpeakerStarted = true;
+            }
+            updateQuanAmSubDisplay();
+            
+            quanamSubInterval = setInterval(() => {
+                if (quanamSubActive === 'sun') {
+                    quanamSunTimeLeft--;
+                    if (quanamSunTimeLeft <= 0) {
+                        quanamSunTimeLeft = 0;
+                        clearInterval(quanamSubInterval);
+                        quanamSubActive = null;
+                        updateQuanAmSubDisplay();
+                        playQuanAmChime();
+                        // Kiểm tra nếu cả 2 đã hết giờ và đã được bấm thì chuyển task
+                        checkQuanAmAllDone();
+                    }
+                } else if (quanamSubActive === 'speaker') {
+                    quanamSpeakerTimeLeft--;
+                    if (quanamSpeakerTimeLeft <= 0) {
+                        quanamSpeakerTimeLeft = 0;
+                        clearInterval(quanamSubInterval);
+                        quanamSubActive = null;
+                        updateQuanAmSubDisplay();
+                        playQuanAmChime();
+                        // Kiểm tra nếu cả 2 đã hết giờ và đã được bấm thì chuyển task
+                        checkQuanAmAllDone();
+                    }
+                }
+                updateQuanAmSubDisplay();
+            }, 1000);
+        }
+        
+        // Kiểm tra xem cả 2 sub-timer đã hoàn thành chưa
+        function checkQuanAmAllDone() {
+            // Chỉ kiểm tra khi đang trong phase task và currentTask là Quán Âm
+            if (currentPhase === "task" && currentTask && currentTask.id === QUANAM_TASK_ID) {
+                const sunDone = quanamSunTimeLeft <= 0 && quanamSunStarted;
+                const speakerDone = quanamSpeakerTimeLeft <= 0 && quanamSpeakerStarted;
+                const bothStarted = quanamSunStarted && quanamSpeakerStarted;
+                
+                // Chỉ khi cả 2 đã được bấm và đều đã hết giờ mới chuyển
+                if (bothStarted && sunDone && speakerDone) {
+                    // Ẩn sub-icons
+                    document.getElementById('quanam-sub-icons').classList.add('hidden');
+                    clearInterval(quanamSubInterval);
+                    quanamSubActive = null;
+                    
+                    // Đánh dấu hoàn thành nhiệm vụ Quán Âm
+                    markTaskCompleted('q1');
+                    
+                    // Xóa timer chính và chuyển sang alarm
+                    clearInterval(timerInterval);
+                    currentTimerTimeLeft = 0;
+                    document.getElementById('display-task').innerText = formatTime(0);
+                    runAlarmPeriod();
+                }
+            }
+        }
+        
+        function playQuanAmChime() {
+            let chimeCount = 0;
+            const chimeInterval = setInterval(() => {
+                playChime();
+                chimeCount++;
+                if (chimeCount >= 5) {
+                    clearInterval(chimeInterval);
+                }
+            }, 2000);
+            playChime();
         }
 
         window.onload = async () => { 
             calculateTime(); 
             setInterval(calculateTime, 1000); 
             await initFirebase();
+            await cleanupOldTasks();
             ensureSetupTask();
+            ensureGiaoLyTask();
+            ensureQuanAmTask();
+            
+            // Khởi tạo kéo thả
+            setTimeout(() => {
+                initDragAndDrop('list-q1');
+                initDragAndDrop('list-q2');
+                sortTasksByOrder('q1');
+                sortTasksByOrder('q2');
+            }, 500);
 
+            // Khôi phục file âm thanh nếu có
             const savedAudioBlob = await loadRingtoneFromDB();
             if (savedAudioBlob) {
                 audioPlayer.src = URL.createObjectURL(savedAudioBlob);
-                showToast("Đã khôi phục nhạc chuông từ bộ nhớ trình duyệt!", "🎵");
+                hasAudioFile = true;
+                updateAudioButtonDisplay();
             }
         };
 
@@ -400,11 +1142,15 @@
                         if (user) {
                             loadSavedTasksFirestore().then(() => {
                                 ensureSetupTask();
+                                ensureGiaoLyTask();
+                                ensureQuanAmTask();
                                 checkActiveFlow();
                             });
                         } else {
                             loadSavedTasksMemory();
                             ensureSetupTask();
+                            ensureGiaoLyTask();
+                            ensureQuanAmTask();
                             checkActiveFlow();
                         }
                     });
@@ -412,11 +1158,15 @@
                     console.error("Lỗi khởi tạo Firebase, chuyển sang chế độ offline:", e);
                     loadSavedTasksMemory();
                     ensureSetupTask();
+                    ensureGiaoLyTask();
+                    ensureQuanAmTask();
                     checkActiveFlow();
                 }
             } else {
                 loadSavedTasksMemory();
                 ensureSetupTask();
+                ensureGiaoLyTask();
+                ensureQuanAmTask();
                 checkActiveFlow();
             }
         }
@@ -437,10 +1187,46 @@
 
         async function handleAudioUpload(e) {
             const file = e.target.files[0];
-            if (file) {
-                audioPlayer.src = URL.createObjectURL(file);
-                await saveRingtoneToDB(file); 
-                showToast("Đã tải và lưu trữ thành công nhạc chuông vào bộ nhớ máy!", "🎵");
+            if (!file) return;
+            
+            const validTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/x-m4a', 'audio/mp4'];
+            const isValidType = validTypes.includes(file.type) || 
+                               file.name.endsWith('.mp3') || 
+                               file.name.endsWith('.mpeg') ||
+                               file.name.endsWith('.wav') || 
+                               file.name.endsWith('.ogg') || 
+                               file.name.endsWith('.aac') || 
+                               file.name.endsWith('.m4a');
+            
+            if (!isValidType) {
+                showToast("Vui lòng chọn file âm thanh (MP3, WAV, OGG, AAC, M4A)!", "⚠️");
+                e.target.value = '';
+                return;
+            }
+            
+            try {
+                const objectURL = URL.createObjectURL(file);
+                audioPlayer.src = objectURL;
+                
+                await saveRingtoneToDB(file);
+                
+                hasAudioFile = true;
+                updateAudioButtonDisplay();
+                
+                const fileName = file.name.length > 15 ? file.name.substring(0, 15) + '...' : file.name;
+                document.getElementById('file-name-display').innerText = fileName;
+                
+                showToast("Đã tải nhạc chuông thành công!", "🎵");
+                
+                audioPlayer.play().then(() => {
+                    audioPlayer.pause();
+                    audioPlayer.currentTime = 0;
+                }).catch(() => {});
+                
+            } catch (error) {
+                console.error("Lỗi xử lý file:", error);
+                showToast("Không thể đọc file âm thanh. Hãy thử file khác!", "⚠️");
+                e.target.value = '';
             }
         }
 
@@ -476,7 +1262,7 @@
             if (audioPlayer.src) {
                 audioPlayer.currentTime = 0;
                 audioPlayer.play().catch(e => {
-                    console.error("Lỗi phát nhạc chuông MP3:", e);
+                    console.error("Lỗi phát nhạc chuông:", e);
                 });
             }
         }
@@ -541,13 +1327,23 @@
                 document.getElementById('list-q2').innerHTML = '';
                 
                 ensureSetupTask();
+                ensureGiaoLyTask();
+                ensureQuanAmTask();
 
                 snapshot.forEach(doc => {
-                    if (doc.id === SETUP_TASK_ID) return;
+                    if (doc.id === SETUP_TASK_ID || doc.id === GIAOLY_TASK_ID || doc.id === QUANAM_TASK_ID) return;
                     
                     const task = doc.data();
-                    createTaskElement(task.title, task.seconds, task.quad, true, task.id, task.fixedTime || "");
+                    const isSaved = task.saved === true;
+                    createTaskElement(task.title, task.seconds, task.quad, isSaved, task.id, task.fixedTime || "", task.saved);
                 });
+                
+                // Sắp xếp lại theo thứ tự đã lưu
+                sortTasksByOrder('q1');
+                sortTasksByOrder('q2');
+                initDragAndDrop('list-q1');
+                initDragAndDrop('list-q2');
+                
                 calculateTime();
             } catch (e) {
                 console.error("Lỗi khi tải dữ liệu từ Firestore:", e);
@@ -559,40 +1355,56 @@
             document.getElementById('list-q1').innerHTML = '';
             document.getElementById('list-q2').innerHTML = '';
             ensureSetupTask();
+            ensureGiaoLyTask();
+            ensureQuanAmTask();
             inMemoryTasks.forEach(task => {
-                if (task.id !== SETUP_TASK_ID) {
-                    createTaskElement(task.title, task.seconds, task.quad, true, task.id, task.fixedTime || "");
+                if (task.id !== SETUP_TASK_ID && task.id !== GIAOLY_TASK_ID && task.id !== QUANAM_TASK_ID) {
+                    const isSaved = task.saved === true;
+                    createTaskElement(task.title, task.seconds, task.quad, isSaved, task.id, task.fixedTime || "", task.saved);
                 }
             });
+            
+            sortTasksByOrder('q1');
+            sortTasksByOrder('q2');
+            initDragAndDrop('list-q1');
+            initDragAndDrop('list-q2');
+            
             calculateTime();
         }
 
         async function saveTaskToStorage(task) {
-            if (task.id === SETUP_TASK_ID) {
-                await saveSetupTaskToStorage();
+            if (task.id === SETUP_TASK_ID || task.id === GIAOLY_TASK_ID || task.id === QUANAM_TASK_ID) {
                 return;
             }
+            
+            const taskToSave = {
+                ...task,
+                saved: task.saved || false,
+                createdAt: task.createdAt || getTodayDateString()
+            };
             
             if (currentUser && db) {
                 try {
                     const docPath = `artifacts/${appId}/users/${currentUser.uid}/tasks/${task.id}`;
-                    await db.doc(docPath).set(task);
-                    showToast("Đã lưu mục tiêu này lên Cloud!", "⭐");
+                    await db.doc(docPath).set(taskToSave);
+                    if (taskToSave.saved) {
+                        showToast("Đã lưu mục tiêu này lên Cloud!", "⭐");
+                    }
                 } catch (e) {
                     console.error("Lỗi Firestore:", e);
                 }
             } else {
                 const index = inMemoryTasks.findIndex(t => t.id === task.id);
                 if (index !== -1) {
-                    inMemoryTasks[index] = task;
+                    inMemoryTasks[index] = taskToSave;
                 } else {
-                    inMemoryTasks.push(task);
+                    inMemoryTasks.push(taskToSave);
                 }
             }
         }
 
         async function removeTaskFromStorage(id) {
-            if (id === SETUP_TASK_ID) {
+            if (id === SETUP_TASK_ID || id === GIAOLY_TASK_ID || id === QUANAM_TASK_ID) {
                 showToast("Không thể xóa nhiệm vụ cố định này!", "⚠️");
                 return;
             }
@@ -705,7 +1517,12 @@
                     playCustomRingtone();
                 }
                 
-                startTimer(Math.floor(diffMs / 1000), currentPhase);
+                // Nếu là Quán Âm, dùng tổng thời gian quanamTotalTime
+                if (currentTask && currentTask.id === QUANAM_TASK_ID && currentPhase === "task") {
+                    startTimer(quanamTotalTime, currentPhase);
+                } else {
+                    startTimer(Math.floor(diffMs / 1000), currentPhase);
+                }
                 showToast("Đang kết nối lại chu kỳ Flow kỷ luật!", "⏳");
             } else {
                 const overdueSeconds = Math.floor(Math.abs(diffMs) / 1000);
@@ -725,6 +1542,25 @@
                     return;
                 }
                 if (phase === "task") {
+                    // Kiểm tra nếu là Quán Âm - chỉ chuyển khi cả 2 sub đã done
+                    if (task.id === QUANAM_TASK_ID) {
+                        const bothStarted = quanamSunStarted && quanamSpeakerStarted;
+                        const sunDone = quanamSunTimeLeft <= 0;
+                        const speakerDone = quanamSpeakerTimeLeft <= 0;
+                        
+                        if (!bothStarted || !sunDone || !speakerDone) {
+                            // Chưa done, giữ nguyên task này
+                            toggleFlowUI(true);
+                            updateDisplayForPhase(task, phase);
+                            updateProgressDisplay();
+                            playChime();
+                            startTimer(5, phase);
+                            return;
+                        }
+                        // Đã done, ẩn sub-icons và đánh dấu hoàn thành
+                        document.getElementById('quanam-sub-icons').classList.add('hidden');
+                        markTaskCompleted('q1');
+                    }
                     phase = "alarm";
                     if (overdueSeconds < alarmSec) {
                         currentPhase = phase;
@@ -761,17 +1597,25 @@
                     if (flowQueue.length > 0) {
                         task = flowQueue.shift();
                         phase = "task";
-                        if (overdueSeconds < task.seconds) {
+                        if (task.id === QUANAM_TASK_ID) {
+                            initQuanAmSubTimers();
+                        }
+                        const taskTime = task.id === QUANAM_TASK_ID ? quanamTotalTime : task.seconds;
+                        if (overdueSeconds < taskTime) {
                             currentPhase = phase;
                             currentTask = task;
                             toggleFlowUI(true);
                             updateDisplayForPhase(task, phase);
                             updateProgressDisplay();
                             playChime();
-                            startTimer(task.seconds - overdueSeconds, phase);
+                            startTimer(taskTime - overdueSeconds, phase);
                             return;
                         } else {
-                            overdueSeconds -= task.seconds;
+                            overdueSeconds -= taskTime;
+                            if (task.id === QUANAM_TASK_ID) {
+                                document.getElementById('quanam-sub-icons').classList.add('hidden');
+                                markTaskCompleted('q1');
+                            }
                         }
                     } else {
                         completeFlow();
@@ -786,8 +1630,16 @@
                 updateDisplay(task.title, task.quad);
             } else if (phase === "alarm") {
                 updateDisplay("🔔");
+                // Ẩn sub-icons khi chuyển sang alarm
+                document.getElementById('quanam-sub-icons').classList.add('hidden');
+                clearInterval(quanamSubInterval);
+                quanamSubActive = null;
             } else if (phase === "rest") {
                 updateDisplay("🧘");
+                // Ẩn sub-icons khi chuyển sang rest
+                document.getElementById('quanam-sub-icons').classList.add('hidden');
+                clearInterval(quanamSubInterval);
+                quanamSubActive = null;
             }
         }
 
@@ -824,7 +1676,15 @@
             document.getElementById('time-remaining').innerText = formatTime(Math.max(0, totalCycleSeconds - secondsSinceStart - totalTaskUsed));
 
             checkFixedTimeTriggers();
+            
+            const currentMinute = now.getMinutes();
+            if (currentMinute !== lastCheckedMinute) {
+                lastCheckedMinute = currentMinute;
+                cleanupOldTasks();
+            }
         }
+        
+        let lastCheckedMinute = -1;
 
         let activeTaskIdForTime = null;
 
@@ -923,18 +1783,19 @@
                     clockIcon.className = `action-icon clock-icon ${fixedTime ? 'text-indigo-600 font-bold' : 'text-slate-400'}`;
                 }
                 
+                const isSaved = item.dataset.saved === "true";
                 const isSetupTask = item.dataset.isSetupTask === "true";
-                const starIcon = item.querySelector('.star-icon');
-                const isSaved = isSetupTask || (starIcon && starIcon.innerText === '★');
                 
-                if (isSaved) {
+                if (isSaved || isSetupTask) {
                     saveTaskToStorage({
                         id: id,
                         title: item.dataset.title,
                         seconds: parseInt(item.dataset.seconds),
                         quad: item.dataset.quad,
                         fixedTime: fixedTime,
-                        isSetupTask: isSetupTask
+                        isSetupTask: isSetupTask,
+                        saved: isSaved,
+                        createdAt: item.dataset.createdAt || getTodayDateString()
                     });
                 }
                 calculateTime();
@@ -1065,8 +1926,13 @@
             
             playChime();
             
-            const taskTime = task.seconds > 0 ? task.seconds : 5;
-            startTimer(taskTime, "task");
+            if (task.id === QUANAM_TASK_ID) {
+                initQuanAmSubTimers();
+                startTimer(quanamTotalTime, "task");
+            } else {
+                const taskTime = task.seconds > 0 ? task.seconds : 5;
+                startTimer(taskTime, "task");
+            }
         }
 
         function addTask(quad) {
@@ -1077,27 +1943,49 @@
             const s = parseInt(document.getElementById('s-' + quad).value) || 0;
             const totalSeconds = h * 3600 + m * 60 + s;
             const id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
-            createTaskElement(input.value, totalSeconds, quad, false, id, "");
+            
+            // Tự động in hoa ký tự đầu
+            let title = input.value.trim();
+            title = title.charAt(0).toUpperCase() + title.slice(1);
+            
+            createTaskElement(title, totalSeconds, quad, false, id, "");
+            
+            saveTaskToStorage({
+                id: id,
+                title: title,
+                seconds: totalSeconds,
+                quad: quad,
+                fixedTime: "",
+                saved: false,
+                createdAt: getTodayDateString()
+            });
+            
             input.value = '';
             document.getElementById('h-' + quad).value = '';
             document.getElementById('m-' + quad).value = '';
             document.getElementById('s-' + quad).value = '';
+            
+            // Cập nhật kéo thả và lưu thứ tự
+            initDragAndDrop('list-' + quad);
+            saveTaskOrder(quad);
             calculateTime();
         }
 
-        function createTaskElement(title, seconds, quad, isSaved, id, fixedTime) {
+        function createTaskElement(title, seconds, quad, isSaved, id, fixedTime, saved) {
             const li = document.createElement('li');
-            li.className = "task-item text-sm";
+            li.className = "task-item text-xs";
             li.dataset.id = id;
             li.dataset.seconds = seconds;
             li.dataset.quad = quad;
             li.dataset.title = title;
             li.dataset.fixedTime = fixedTime || "";
+            li.dataset.saved = (saved === true || isSaved) ? "true" : "false";
+            li.draggable = true;
             
-            const timeLabelHTML = fixedTime ? ` <span class="fixed-time-label text-indigo-500 font-mono text-[11px]">⏰ ${fixedTime}</span>` : `<span class="fixed-time-label text-indigo-500 font-mono text-[11px]"></span>`;
+            const timeLabelHTML = fixedTime ? ` <span class="fixed-time-label text-indigo-500 font-mono text-[10px]">⏰ ${fixedTime}</span>` : `<span class="fixed-time-label text-indigo-500 font-mono text-[10px]"></span>`;
             const clockColorClass = fixedTime ? 'text-indigo-600 font-bold' : 'text-slate-400';
 
-            li.innerHTML = `<span class="task-content text-slate-700 font-medium">${title} ${seconds > 0 ? `<small class="text-slate-400 ml-2 font-mono">${formatTime(seconds)}</small>` : ''}${timeLabelHTML}</span>
+            li.innerHTML = `<span class="drag-handle">⋮⋮</span><span class="task-content text-slate-700 font-medium">${title} ${seconds > 0 ? `<small class="text-slate-400 ml-1 font-mono text-[11px]">${formatTime(seconds)}</small>` : ''}${timeLabelHTML}</span>
             <div class="task-actions">
                 <span class="action-icon clock-icon ${clockColorClass}" onclick="openTimePicker('${id}')">🕒</span>
                 <span class="action-icon star-icon text-amber-500" onclick="toggleSave(this,'${id}','${title}',${seconds},'${quad}')">${isSaved ? '★' : '☆'}</span>
@@ -1107,29 +1995,45 @@
         }
 
         function toggleSave(el, id, title, seconds, quad) {
-            if (id === SETUP_TASK_ID) {
+            if (id === SETUP_TASK_ID || id === GIAOLY_TASK_ID || id === QUANAM_TASK_ID) {
                 showToast("Nhiệm vụ này luôn được lưu!", "ℹ️");
                 return;
             }
             
             const item = document.querySelector(`[data-id="${id}"]`);
             const fixedTime = item ? (item.dataset.fixedTime || "") : "";
-            if (el.innerText === '☆') { 
-                el.innerText = '★'; 
-                saveTaskToStorage({id, title, seconds, quad, fixedTime}); 
+            const isNowSaved = el.innerText === '☆';
+            
+            if (isNowSaved) { 
+                el.innerText = '★';
+                item.dataset.saved = "true";
+                saveTaskToStorage({
+                    id, title, seconds, quad, fixedTime,
+                    saved: true,
+                    createdAt: item.dataset.createdAt || getTodayDateString()
+                });
+                showToast("Đã lưu nhiệm vụ! Nhiệm vụ sẽ không bị xóa khi qua ngày mới.", "⭐");
             } else { 
-                el.innerText = '☆'; 
-                removeTaskFromStorage(id); 
+                el.innerText = '☆';
+                item.dataset.saved = "false";
+                saveTaskToStorage({
+                    id, title, seconds, quad, fixedTime,
+                    saved: false,
+                    createdAt: getTodayDateString()
+                });
+                showToast("Đã bỏ lưu nhiệm vụ! Nhiệm vụ sẽ bị xóa khi qua ngày mới.", "ℹ️");
             }
         }
 
         function deleteTask(el, id) { 
-            if (id === SETUP_TASK_ID) {
+            if (id === SETUP_TASK_ID || id === GIAOLY_TASK_ID || id === QUANAM_TASK_ID) {
                 showToast("Không thể xóa nhiệm vụ cố định này!", "⚠️");
                 return;
             }
-            el.parentElement.parentElement.remove(); 
-            removeTaskFromStorage(id); 
+            const quad = el.closest('.task-item').dataset.quad;
+            el.closest('.task-item').remove(); 
+            removeTaskFromStorage(id);
+            saveTaskOrder(quad);
             calculateTime(); 
         }
 
@@ -1172,13 +2076,40 @@
             countTasksByQuad();
             
             flowQueue = [];
-            document.querySelectorAll('.task-item').forEach(item => {
+            
+            // Lấy danh sách nhiệm vụ theo thứ tự hiển thị (đã được sắp xếp)
+            const q1Items = document.querySelectorAll('#list-q1 .task-item');
+            const q2Items = document.querySelectorAll('#list-q2 .task-item');
+            
+            // Xử lý q1 trước (ưu tiên cao hơn)
+            q1Items.forEach(item => {
                 if (item.dataset.id === SETUP_TASK_ID) return;
                 
                 const seconds = parseInt(item.dataset.seconds);
                 const fixedTime = item.dataset.fixedTime || "";
                 if (seconds > 0 && !fixedTime) {
-                    flowQueue.push({ title: item.dataset.title, seconds, quad: item.dataset.quad, fixedTime: "" });
+                    flowQueue.push({ 
+                        title: item.dataset.title, 
+                        seconds, 
+                        quad: item.dataset.quad, 
+                        fixedTime: "",
+                        id: item.dataset.id
+                    });
+                }
+            });
+            
+            // Sau đó đến q2
+            q2Items.forEach(item => {
+                const seconds = parseInt(item.dataset.seconds);
+                const fixedTime = item.dataset.fixedTime || "";
+                if (seconds > 0 && !fixedTime) {
+                    flowQueue.push({ 
+                        title: item.dataset.title, 
+                        seconds, 
+                        quad: item.dataset.quad, 
+                        fixedTime: "",
+                        id: item.dataset.id
+                    });
                 }
             });
 
@@ -1206,6 +2137,18 @@
             if (quad === 'q1') label.classList.add('text-red-500');
             else if (quad === 'q2') label.classList.add('text-emerald-500');
             else label.classList.add('text-amber-500');
+            
+            const quanamSubIcons = document.getElementById('quanam-sub-icons');
+            if (quanamSubIcons) {
+                if (currentTask && currentTask.id === QUANAM_TASK_ID && currentPhase === "task") {
+                    quanamSubIcons.classList.remove('hidden');
+                    initQuanAmSubTimers();
+                } else {
+                    quanamSubIcons.classList.add('hidden');
+                    clearInterval(quanamSubInterval);
+                    quanamSubActive = null;
+                }
+            }
         }
 
         function runNextTask() {
@@ -1215,22 +2158,47 @@
             }
             stopCustomRingtone();
             
-            if (currentTask && currentTask.quad) {
+            // Đánh dấu hoàn thành task hiện tại (chỉ khi đang ở phase task và không phải Quán Âm)
+            // Quán Âm được đánh dấu hoàn thành riêng trong checkQuanAmAllDone()
+            if (currentTask && currentTask.quad && currentPhase === "task" && currentTask.id !== QUANAM_TASK_ID) {
                 markTaskCompleted(currentTask.quad);
             }
+            
+            // Ẩn sub-icons khi chuyển task
+            document.getElementById('quanam-sub-icons').classList.add('hidden');
+            clearInterval(quanamSubInterval);
+            quanamSubActive = null;
+            quanamSunStarted = false;
+            quanamSpeakerStarted = false;
             
             currentTask = flowQueue.shift();
             currentPhase = "task";
             updateDisplay(currentTask.title, currentTask.quad);
             playChime();
-            startTimer(currentTask.seconds, "task");
+            
+            // Nếu là Quán Âm, dùng tổng thời gian 2.5x
+            if (currentTask.id === QUANAM_TASK_ID) {
+                initQuanAmSubTimers();
+                startTimer(quanamTotalTime, "task");
+            } else {
+                startTimer(currentTask.seconds, "task");
+            }
         }
 
         function skipTask() {
             stopCustomRingtone();
+            
+            document.getElementById('quanam-sub-icons').classList.add('hidden');
+            clearInterval(quanamSubInterval);
+            quanamSubActive = null;
+            quanamSunStarted = false;
+            quanamSpeakerStarted = false;
+            
             showToast(`Đã bỏ qua nhiệm vụ: ${currentTask ? currentTask.title : ''}`, "⏭️");
             
-            if (currentTask && currentTask.quad) {
+            // Đánh dấu hoàn thành task hiện tại khi skip (chỉ khi ở phase task và không phải Quán Âm)
+            // Quán Âm khi skip vẫn tính là hoàn thành vì người dùng chủ động bỏ qua
+            if (currentTask && currentTask.quad && currentPhase === "task") {
                 markTaskCompleted(currentTask.quad);
             }
             
@@ -1242,9 +2210,18 @@
         }
 
         function runAlarmPeriod() {
-            if (currentTask && currentTask.quad && currentPhase === "task") {
+            // Đánh dấu hoàn thành task hiện tại (chỉ khi đang ở phase task và không phải Quán Âm)
+            // Quán Âm được đánh dấu hoàn thành riêng trong checkQuanAmAllDone()
+            if (currentTask && currentTask.quad && currentPhase === "task" && currentTask.id !== QUANAM_TASK_ID) {
                 markTaskCompleted(currentTask.quad);
             }
+            
+            // Ẩn sub-icons
+            document.getElementById('quanam-sub-icons').classList.add('hidden');
+            clearInterval(quanamSubInterval);
+            quanamSubActive = null;
+            quanamSunStarted = false;
+            quanamSpeakerStarted = false;
             
             currentPhase = "alarm";
             updateDisplay("🔔");
@@ -1275,8 +2252,61 @@
 
             timerInterval = setInterval(() => {
                 currentTimerTimeLeft--;
+                
+                // Kiểm tra Quán Âm sub-timers khi đang ở phase task
+                if (mode === "task" && currentTask && currentTask.id === QUANAM_TASK_ID) {
+                    const bothStarted = quanamSunStarted && quanamSpeakerStarted;
+                    const sunDone = quanamSunTimeLeft <= 0 && quanamSunStarted;
+                    const speakerDone = quanamSpeakerTimeLeft <= 0 && quanamSpeakerStarted;
+                    
+                    // Chỉ khi cả 2 đã được bấm và đều đã hết giờ mới chuyển
+                    if (bothStarted && sunDone && speakerDone) {
+                        clearInterval(timerInterval);
+                        clearInterval(quanamSubInterval);
+                        quanamSubActive = null;
+                        document.getElementById('display-task').innerText = formatTime(0);
+                        document.getElementById('quanam-sub-icons').classList.add('hidden');
+                        // Đánh dấu hoàn thành và chuyển sang alarm
+                        markTaskCompleted('q1');
+                        runAlarmPeriod();
+                        return;
+                    }
+                    
+                    // Nếu chưa bấm cả 2, giữ nguyên timer không giảm xuống dưới 1
+                    if (!bothStarted) {
+                        if (currentTimerTimeLeft <= 0) {
+                            currentTimerTimeLeft = 1;
+                        }
+                    }
+                    
+                    // Nếu đã bấm cả 2 nhưng chưa hết cả 2
+                    if (bothStarted && (!sunDone || !speakerDone)) {
+                        if (currentTimerTimeLeft <= 0) {
+                            currentTimerTimeLeft = 1;
+                        }
+                    }
+                }
+                
                 if (currentTimerTimeLeft < 0) {
                     clearInterval(timerInterval);
+                    
+                    // Trước khi chuyển phase, kiểm tra Quán Âm
+                    if (mode === "task" && currentTask && currentTask.id === QUANAM_TASK_ID) {
+                        const bothStarted = quanamSunStarted && quanamSpeakerStarted;
+                        const sunDone = quanamSunTimeLeft <= 0 && quanamSunStarted;
+                        const speakerDone = quanamSpeakerTimeLeft <= 0 && quanamSpeakerStarted;
+                        
+                        // Chỉ chuyển khi cả 2 đã bấm và đều hết giờ
+                        if (!bothStarted || !sunDone || !speakerDone) {
+                            currentTimerTimeLeft = 1;
+                            document.getElementById('display-task').innerText = formatTime(1);
+                            return;
+                        }
+                        // Nếu đã done thì chuyển
+                        document.getElementById('quanam-sub-icons').classList.add('hidden');
+                        markTaskCompleted('q1');
+                    }
+                    
                     if (mode === "task") runAlarmPeriod();
                     else if (mode === "alarm") runRestPeriod();
                     else runNextTask();
@@ -1292,6 +2322,10 @@
             }
             
             clearInterval(timerInterval);
+            clearInterval(quanamSubInterval);
+            quanamSubActive = null;
+            quanamSunStarted = false;
+            quanamSpeakerStarted = false;
             stopCustomRingtone();
             flowQueue = [];
             currentTask = null;
@@ -1316,6 +2350,11 @@
             } else {
                 mainUi.classList.remove('hidden');
                 flowUi.classList.add('hidden');
+                document.getElementById('quanam-sub-icons').classList.add('hidden');
+                clearInterval(quanamSubInterval);
+                quanamSubActive = null;
+                quanamSunStarted = false;
+                quanamSpeakerStarted = false;
             }
         }
         
