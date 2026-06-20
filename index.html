@@ -3,806 +3,1326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mục Tiêu Về Nhà</title>
+    <title>Mục Tiêu Về Nhà & Flow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs (v9 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        /* CSS Thuần túy - Không cần nạp từ Internet - Chạy offline 100% */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
+        body { background: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        .task-card { background: white; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .input-unit { position: relative; display: flex; align-items: center; }
+        .input-unit input { width: 100%; padding: 8px 20px 8px 10px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; text-align: center; }
+        .input-unit span { position: absolute; right: 8px; color: #94a3b8; font-size: 12px; pointer-events: none; }
+        .task-item { border-bottom: 1px solid #f8fafc; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .task-item .task-content { flex: 1; min-width: 0; }
+        .task-item .task-actions { display: flex; gap: 12px; min-width: 84px; justify-content: flex-end; }
+        .setting-label { font-size: 0.6rem; font-weight: 700; color: #64748b; margin-bottom: 0.25rem; text-transform: uppercase; text-align: center; display: block; }
+        .setting-container { position: relative; display: flex; align-items: center; width: 100%; }
+        .setting-input { width: 100%; padding: 4px 18px 4px 6px; font-size: 0.7rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; text-align: center; box-sizing: border-box; }
+        .setting-unit { position: absolute; right: 6px; color: #94a3b8; font-size: 0.7rem; pointer-events: none; }
+        .action-icon { cursor: pointer; padding: 4px; transition: transform 0.2s; display: inline-block; }
+        .action-icon:hover { transform: scale(1.2); }
+        
+        @keyframes gold-glow {
+            0%, 100% { text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 10px #fbbf24, 0 0 20px #fbbf24, 0 0 30px #d97706; opacity: 1; }
+            50% { text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 5px #fbbf24, 0 0 10px #fbbf24, 0 0 15px #d97706; opacity: 0.8; }
         }
-
-        body {
-            background: linear-gradient(135deg, #f1f5f9 0%, #fff5f5 100%);
-            color: #1e293b;
-            min-height: 100vh;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .gold-shimmer { animation: gold-glow 1.5s infinite; }
+        .gold-metallic {
+            background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
         }
-
-        .container {
+        
+        /* Style cho số đếm ngược trong giao diện chờ - 80% của vòng tròn */
+        .countdown-number {
+            font-size: 3rem !important;
+            line-height: 1;
+        }
+        
+        /* Style cho input giờ và phút nhỏ - đồng bộ với setting-input */
+        .time-small-input {
             width: 100%;
-            max-width: 420px;
-            margin: 0 auto;
-            padding-bottom: 80px;
-        }
-
-        /* Header phong cách tối giản sáng sủa */
-        header {
+            padding: 4px 2px;
+            font-size: 0.65rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
             text-align: center;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 16px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            margin-bottom: 12px;
+            box-sizing: border-box;
         }
-
-        header p.title-sub {
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #ef4444;
-            margin-bottom: 2px;
-        }
-
-        header h1 {
-            font-size: 22px;
-            font-weight: 900;
-            color: #0f172a;
-            letter-spacing: 0.5px;
-        }
-
-        .divider {
-            width: 40px;
-            height: 2px;
-            background: linear-gradient(90deg, #ef4444, #10b981);
-            margin: 8px auto;
-            border-radius: 2px;
-        }
-
-        header p.title-sub-green {
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #10b981;
-            margin-bottom: 2px;
-        }
-
-        header h2 {
-            font-size: 16px;
-            font-weight: 800;
-            color: #334155;
-        }
-
-        /* Ô thời gian thực nhỏ gọn tinh tế */
-        .clock-bar {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 8px 16px;
-            border-radius: 14px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        
+        /* Container cho GIỜ BẮT ĐẦU để đồng bộ với các ô khác */
+        .time-start-container {
             display: flex;
+            gap: 2px;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .clock-left {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #475569;
-        }
-
-        .clock-left svg {
-            width: 15px;
-            height: 15px;
-            color: #ef4444;
-        }
-
-        .clock-time {
-            font-weight: 800;
-            color: #0f172a;
-            letter-spacing: 0.5px;
-            font-size: 13px;
-        }
-
-        .clock-right-badge {
-            font-size: 9px;
-            background: #e2e8f0;
-            color: #475569;
-            padding: 2px 8px;
-            border-radius: 99px;
-            font-weight: 700;
-        }
-
-        /* Cấu trúc các ô Ma Trận */
-        main {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
             width: 100%;
         }
-
-        section {
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border-top: 1px solid rgba(255,255,255,0.7);
-            border-right: 1px solid rgba(0,0,0,0.02);
-            border-bottom: 1px solid rgba(0,0,0,0.02);
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
-
-        /* Q1: Ô QUAN TRỌNG KHẨN CẤP ĐỎ RỰC RỠ TRÊN CÙNG */
-        #section-q1 {
-            border-left: 8px solid #ef4444;
-            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.08);
-        }
-
-        /* Q2: Ô QUAN TRỌNG KHÔNG KHẨN CẤP XANH LỤC */
-        #section-q2 {
-            border-left: 5px solid #10b981;
-        }
-
-        /* Tiêu đề góc phần tư */
-        .section-header {
-            padding: 12px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #section-q1 .section-header {
-            background: rgba(239, 68, 68, 0.06);
-            border-bottom: 1px solid rgba(239, 68, 68, 0.1);
-        }
-
-        #section-q2 .section-header {
-            background: rgba(10, 185, 121, 0.06);
-            border-bottom: 1px solid rgba(10, 185, 121, 0.1);
-        }
-
-        .header-title-box {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header-icon-wrapper {
-            padding: 6px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #section-q1 .header-icon-wrapper {
-            background: rgba(239, 68, 68, 0.15);
-            color: #dc2626;
-        }
-
-        #section-q2 .header-icon-wrapper {
-            background: rgba(10, 185, 121, 0.15);
-            color: #059669;
-        }
-
-        .header-text-box h3 {
-            font-size: 12px;
-            font-weight: 900;
-            letter-spacing: 0.2px;
-        }
-
-        #section-q1 .header-text-box h3 { color: #b91c1c; }
-        #section-q2 .header-text-box h3 { color: #047857; }
-
-        .header-text-box p {
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #64748b;
-            margin-top: 1px;
-        }
-
-        .counter-badge {
-            font-size: 10px;
-            font-weight: 900;
-            padding: 2px 8px;
-            border-radius: 99px;
-        }
-
-        #section-q1 .counter-badge {
-            background: #ef4444;
-            color: #ffffff;
-        }
-
-        #section-q2 .counter-badge {
-            background: rgba(10, 185, 121, 0.2);
-            color: #047857;
-            border: 1px solid rgba(10, 185, 121, 0.3);
-        }
-
-        /* Khu vực nhập liệu & danh sách */
-        .section-content {
-            padding: 12px;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .input-group input {
-            flex: 1;
-            font-size: 12px;
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1px solid #cbd5e1;
-            outline: none;
-            background: #f8fafc;
-            color: #1e293b;
-            transition: border 0.15s;
-        }
-
-        #section-q1 .input-group input:focus { border-color: #ef4444; }
-        #section-q2 .input-group input:focus { border-color: #10b981; }
-
-        .input-group button {
-            border: none;
-            padding: 0 14px;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #section-q1 .input-group button { background: #ef4444; }
-        #section-q2 .input-group button { background: #10b981; }
-
-        .task-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .task-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8fafc;
-            padding: 10px 12px;
-            border-radius: 12px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.01);
-        }
-
-        .task-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
+        
+        .time-start-container input {
             flex: 1;
             min-width: 0;
         }
-
-        .task-checkbox {
-            width: 18px;
-            height: 18px;
-            border-radius: 5px;
-            border: 2px solid #cbd5e1;
-            cursor: pointer;
-            appearance: none;
-            display: flex;
+        
+        /* Style cho ô hiển thị tiến độ nhiệm vụ */
+        .progress-badge {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s;
-            background: white;
-        }
-
-        .task-checkbox:checked {
-            border-color: currentColor;
-            background-color: currentColor;
-        }
-
-        /* Đánh dấu check thủ công bằng SVG tích hợp */
-        .task-checkbox:checked::after {
-            content: "";
-            width: 10px;
-            height: 6px;
-            border-left: 2px solid white;
-            border-bottom: 2px solid white;
-            transform: rotate(-45deg) translate(1px, -1px);
-        }
-
-        #section-q1 .task-checkbox { color: #ef4444; }
-        #section-q2 .task-checkbox { color: #10b981; }
-
-        .task-text {
-            font-size: 13px;
+            min-width: 48px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 700;
-            color: #334155;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .task-text.done {
-            text-decoration: line-through;
-            color: #94a3b8 !important;
-        }
-
-        .delete-btn {
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .delete-btn:hover {
-            color: #ef4444;
-            background: #fee2e2;
-        }
-
-        /* Chân trang điều khiển cố định */
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: 420px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid #f1f5f9;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            border-radius: 16px 16px 0 0;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.03);
-        }
-
-        .footer-btn {
-            border: none;
-            padding: 8px 14px;
-            font-size: 11px;
-            font-weight: 800;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: transform 0.1s;
-        }
-
-        .footer-btn-widget {
-            background: #4f46e5;
-            color: white;
-        }
-
-        .footer-btn-reset {
-            background: #fee2e2;
-            color: #ef4444;
-        }
-
-        /* CHẾ ĐỘ WIDGET THU GỌN */
-        .widget-header-mini {
-            display: none;
-            width: 100%;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 10px;
-            background: rgba(255,255,255,0.7);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(255,255,255,0.5);
-        }
-
-        .widget-title-text {
-            font-size: 9px;
-            font-weight: 900;
-            color: #0f172a;
-            letter-spacing: 1px;
-        }
-
-        .widget-exit-btn {
-            background: #e2e8f0;
-            border: none;
-            padding: 2px 8px;
-            font-size: 8px;
-            font-weight: 800;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        /* Lớp phủ khi bật Widget Mode */
-        body.widget-mode {
-            background: transparent !important;
-            padding: 4px;
-        }
-
-        body.widget-mode #full-app-container,
-        body.widget-mode footer,
-        body.widget-mode .input-group,
-        body.widget-mode .delete-btn {
-            display: none !important;
-        }
-
-        body.widget-mode .widget-header-mini {
-            display: flex;
-        }
-
-        body.widget-mode .container {
-            padding-bottom: 0px;
-        }
-
-        body.widget-mode section {
-            box-shadow: none;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        /* Toast thông báo */
-        #toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #10b981;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 800;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: none;
-            z-index: 1000;
+            font-family: monospace;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
-<body>
+<body class="pb-10 pt-4">
 
-    <div id="toast">Thông báo</div>
+    <div class="max-w-md mx-auto px-4" id="main-ui">
+        <header class="flex flex-col mb-8 text-center">
+            <div class="grid grid-cols-4 gap-2 mt-4 mb-4">
+                <div>
+                    <label class="setting-label">🎵</label>
+                    <input type="file" id="ringtone-upload" accept="audio/mp3" class="setting-input file:py-0 file:px-1 file:text-[8px] text-[8px]" onchange="handleAudioUpload(event)">
+                </div>
+                <div>
+                    <label class="setting-label">GIỜ BẮT ĐẦU</label>
+                    <div class="time-start-container">
+                        <input type="number" id="start-hour" value="21" min="0" max="23" onchange="calculateTime()" class="time-small-input">
+                        <span class="text-[10px] text-slate-400">:</span>
+                        <input type="number" id="start-minute" value="0" min="0" max="59" onchange="calculateTime()" class="time-small-input">
+                    </div>
+                </div>
+                <div>
+                    <label class="setting-label">🧘</label>
+                    <div class="setting-container">
+                        <input type="number" id="rest-minutes" value="1" min="0" onchange="calculateTime()" class="setting-input">
+                        <span class="setting-unit">'</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="setting-label">🔔</label>
+                    <div class="setting-container">
+                        <input type="number" id="alarm-minutes" value="1" min="0" onchange="calculateTime()" class="setting-input">
+                        <span class="setting-unit">'</span>
+                    </div>
+                </div>
+            </div>
+            <button onclick="startFullFlow()" class="w-full bg-indigo-600 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition mb-4">BẮT ĐẦU</button>
+            
+            <div class="bg-white border-2 border-indigo-50 p-4 rounded-2xl text-center shadow-sm">
+                <div class="text-[10px] uppercase font-bold text-slate-400">Thời gian còn lại trong ngày</div>
+                <div id="time-remaining" class="text-4xl font-mono font-black text-red-600">00:00:00</div>
+            </div>
+        </header>
 
-    <div class="container">
-        <!-- Chế độ Widget thu nhỏ -->
-        <div class="widget-header-mini">
-            <span class="widget-title-text">VỀ NHÀ - THU NHẬP THỤ ĐỘNG</span>
-            <button class="widget-exit-btn" onclick="exitWidgetMode()">Đầy đủ</button>
+        <section class="task-card p-5 mb-5 border-l-8 border-red-500">
+            <h3 class="font-bold text-slate-700 mb-4 text-lg flex items-center justify-center gap-2">🔥 ⭐</h3>
+            <div class="space-y-3">
+                <input type="text" id="task-q1" placeholder="Nhiệm vụ..." class="w-full p-3 border rounded-xl text-sm">
+                <div class="flex gap-2">
+                    <div class="input-unit w-1/4"><input type="number" id="h-q1" placeholder="0" min="0"><span>h</span></div>
+                    <div class="input-unit w-1/4"><input type="number" id="m-q1" placeholder="0" min="0" max="59"><span>'</span></div>
+                    <div class="input-unit w-1/4"><input type="number" id="s-q1" placeholder="0" min="0" max="59"><span>s</span></div>
+                    <button onclick="addTask('q1')" class="w-1/4 bg-red-500 text-white rounded-xl font-bold text-sm">Thêm</button>
+                </div>
+            </div>
+            <ul id="list-q1" class="mt-4"></ul>
+        </section>
+
+        <section class="task-card p-5 border-l-8 border-emerald-500">
+            <h3 class="font-bold text-slate-700 mb-4 text-lg flex items-center justify-center gap-1">⭐⭐⭐⭐⭐</h3>
+            <div class="space-y-3">
+                <input type="text" id="task-q2" placeholder="Thói quen..." class="w-full p-3 border rounded-xl text-sm">
+                <div class="flex gap-2">
+                    <div class="input-unit w-1/4"><input type="number" id="h-q2" placeholder="0" min="0"><span>h</span></div>
+                    <div class="input-unit w-1/4"><input type="number" id="m-q2" placeholder="0" min="0" max="59"><span>'</span></div>
+                    <div class="input-unit w-1/4"><input type="number" id="s-q2" placeholder="0" min="0" max="59"><span>s</span></div>
+                    <button onclick="addTask('q2')" class="w-1/4 bg-emerald-500 text-white rounded-xl font-bold text-sm">Thêm</button>
+                </div>
+            </div>
+            <ul id="list-q2" class="mt-4"></ul>
+        </section>
+    </div>
+
+    <!-- Giao diện Flow (đếm ngược nhiệm vụ) -->
+    <div id="flow-ui" class="hidden fixed inset-0 bg-[#5d4037] text-amber-50 p-6 flex flex-col items-center justify-center z-50">
+        <div class="text-center mb-4">
+            <h1 class="text-5xl font-serif italic font-bold gold-metallic">Về Nhà</h1>
+            <div class="text-sm text-teal-300 font-semibold mt-1">💸 Thu Nhập Thụ Động</div>
+            <p class="text-[8px] md:text-[10px] text-stone-300 italic mt-1 uppercase tracking-tight whitespace-nowrap">💼 Massage Trị Liệu • 🎵 Hát Dân Ca & Bolero • ✍️ Sáng Tác Nhạc</p>
         </div>
 
-        <!-- CHẾ ĐỘ THƯỜNG -->
-        <div id="full-app-container">
-            <!-- Tiêu đề -->
-            <header>
-                <p class="title-sub">Mục Tiêu Tối Thượng</p>
-                <h1>VỀ NHÀ</h1>
-                <div class="divider"></div>
-                <p class="title-sub-green">Mục Tiêu Tài Chính</p>
-                <h2>Thu Nhập Thụ Động</h2>
-            </header>
-
-            <!-- Thời gian thực nhỏ gọn -->
-            <div class="clock-bar">
-                <div class="clock-left">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span id="current-date">Đang tải...</span>
-                    <span>|</span>
-                    <span id="current-time" class="clock-time">00:00:00</span>
-                </div>
-                <span class="clock-right-badge">Offline</span>
+        <!-- Ô hiển thị tiến độ nhiệm vụ -->
+        <div class="flex gap-3 mb-4">
+            <div id="progress-q1" class="progress-badge bg-red-500/20 text-red-300 border border-red-500/50">
+                🔥 0/0
+            </div>
+            <div id="progress-q2" class="progress-badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/50">
+                ⭐ 0/0
             </div>
         </div>
 
-        <!-- Eisenhower Matrix Container -->
-        <main>
-            <!-- 1. QUAN TRỌNG & KHẨN CẤP (Q1 - ĐỎ RỰC RỠ, NẰM TRÊN CÙNG) -->
-            <section id="section-q1">
-                <div class="section-header">
-                    <div class="header-title-box">
-                        <div class="header-icon-wrapper">
-                            <svg class="w-4 h-4" style="width:16px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                        </div>
-                        <div class="header-text-box">
-                            <h3>QUAN TRỌNG - KHẨN CẤP</h3>
-                            <p>Làm ngay lập tức</p>
-                        </div>
-                    </div>
-                    <span class="counter-badge" id="count-q1">0/0</span>
-                </div>
-                <div class="section-content">
-                    <div class="input-group" id="input-container-q1">
-                        <input type="text" id="input-q1" placeholder="Thêm việc khẩn cấp...">
-                        <button onclick="addTask('q1')">
-                            <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <ul class="task-list" id="list-q1"></ul>
-                </div>
-            </section>
+        <div class="w-full max-w-xs mb-4 px-4 bg-[#4e342e] p-3 rounded-2xl border border-[#8d6e63]/30 shadow-md">
+            <div class="flex justify-between text-xs text-stone-300 font-bold mb-1.5 uppercase tracking-wider items-center">
+                <span>⏳</span>
+                <span id="flow-cycle-remaining" class="font-mono text-amber-400">00:00:00</span>
+            </div>
+            <div class="w-full bg-[#3e2723] h-2 rounded-full overflow-hidden">
+                <div id="flow-cycle-bar" class="bg-gradient-to-r from-amber-500 to-yellow-300 h-full w-[100%] transition-all duration-1000 ease-linear"></div>
+            </div>
+        </div>
 
-            <!-- 2. QUAN TRỌNG & KHÔNG KHẨN CẤP (Q2 - XANH LỤC BẢO) -->
-            <section id="section-q2">
-                <div class="section-header">
-                    <div class="header-title-box">
-                        <div class="header-icon-wrapper">
-                            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                        </div>
-                        <div class="header-text-box">
-                            <h3>QUAN TRỌNG - KHÔNG KHẨN CẤP</h3>
-                            <p>Rèn luyện hàng ngày</p>
-                        </div>
-                    </div>
-                    <span class="counter-badge" id="count-q2">0/10</span>
-                </div>
-                <div class="section-content">
-                    <div class="input-group" id="input-container-q2">
-                        <input type="text" id="input-q2" placeholder="Thêm việc rèn luyện dài hạn...">
-                        <button onclick="addTask('q2')">
-                            <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <ul class="task-list" id="list-q2"></ul>
-                </div>
-            </section>
-        </main>
+        <div id="display-container" class="mb-6 w-full max-w-sm flex items-center justify-center px-4">
+            <h2 id="display-name" class="font-black uppercase tracking-widest text-center text-4xl leading-tight gold-shimmer">Đang tải...</h2>
+        </div>
+        
+        <div class="w-72 h-72 border-[8px] border-[#fbbf24] rounded-full flex items-center justify-center mb-8 bg-[#6d4c41] shadow-[inset_0_4px_6px_rgba(255,255,255,0.3),0_10px_15px_rgba(0,0,0,0.4)]">
+            <div id="display-task" class="text-5xl font-extrabold text-amber-100 font-mono tracking-tighter">00:00:00</div>
+        </div>
+        
+        <button class="w-48 bg-emerald-600 hover:bg-emerald-700 transition text-white border border-emerald-400 p-3 rounded-2xl font-bold shadow-lg" onclick="skipTask()">BỎ QUA NV</button>
     </div>
 
-    <!-- Chân trang điều khiển -->
-    <footer id="footer-controls">
-        <button class="footer-btn footer-btn-widget" onclick="enterWidgetMode()">
-            <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-            </svg>
-            Chế độ Widget
+    <!-- Giao diện đếm ngược -->
+    <div id="countdown-ui" class="hidden fixed inset-0 bg-gradient-to-b from-[#1a237e] to-[#0d47a1] text-white p-6 flex flex-col items-center justify-center z-50">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-2">⏰ Cài Đặt Nhiệm Vụ</h1>
+            <p class="text-blue-200 text-sm">Thời gian còn lại đến giờ bắt đầu</p>
+        </div>
+        
+        <div class="w-64 h-64 border-[8px] border-blue-300 rounded-full flex items-center justify-center mb-8 bg-blue-900/50 shadow-[inset_0_4px_6px_rgba(255,255,255,0.2),0_10px_15px_rgba(0,0,0,0.5)]">
+            <div id="countdown-display" class="countdown-number font-extrabold text-blue-100 font-mono tracking-tighter">00:00:00</div>
+        </div>
+        
+        <p id="countdown-status" class="text-blue-200 text-sm mb-8">Đang chờ đến giờ bắt đầu...</p>
+        
+        <button onclick="goToSetupTasks()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-8 py-3 rounded-xl font-bold shadow-lg transition mb-4">
+            📋 Cài đặt nhiệm vụ
         </button>
-        <button class="footer-btn footer-btn-reset" onclick="resetToDefaultState()">
-            <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18"></path>
-            </svg>
-            Đặt lại ngày
+        
+        <button onclick="cancelCountdown()" class="text-blue-300 hover:text-white text-sm font-semibold transition">
+            Quay lại
         </button>
-    </footer>
+    </div>
+
+    <!-- Time Picker Modal -->
+    <div id="time-picker-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[60]">
+        <div class="bg-white p-6 rounded-2xl w-80 text-center shadow-2xl mx-4">
+            <h4 class="font-bold text-slate-800 mb-2 text-sm uppercase tracking-wider">⏱️ CÀI ĐẶT GIỜ CỐ ĐỊNH</h4>
+            <p class="text-slate-400 text-xs mb-4" id="time-picker-hint">Nhiệm vụ sẽ tự động chạy chính xác tại thời điểm được cài đặt.</p>
+            <div class="flex gap-2 justify-center items-center mb-5">
+                <div class="flex flex-col items-center">
+                    <span class="text-[10px] font-bold text-slate-400 mb-1">GIỜ</span>
+                    <input type="number" id="picker-hour" min="0" max="23" placeholder="21" class="w-16 p-3 border rounded-xl text-center text-base font-mono font-bold text-slate-800">
+                </div>
+                <span class="font-bold text-slate-400 text-lg mt-4">:</span>
+                <div class="flex flex-col items-center">
+                    <span class="text-[10px] font-bold text-slate-400 mb-1">PHÚT</span>
+                    <input type="number" id="picker-minute" min="0" max="59" placeholder="00" class="w-16 p-3 border rounded-xl text-center text-base font-mono font-bold text-slate-800">
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="clearPickerTime()" class="w-1/2 py-2.5 bg-rose-50 text-rose-600 rounded-xl font-bold text-xs transition hover:bg-rose-100">HỦY GIỜ</button>
+                <button onclick="savePickerTime()" class="w-1/2 py-2.5 bg-indigo-600 text-white rounded-xl font-bold text-xs transition hover:bg-indigo-700 shadow-md">XÁC NHẬN</button>
+            </div>
+            <button onclick="closeTimePicker()" class="mt-4 text-slate-400 hover:text-slate-600 text-xs font-semibold block w-full text-center">Đóng hộp thoại</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="custom-toast" class="hidden fixed bottom-5 right-5 left-5 md:left-auto md:w-80 bg-slate-900 text-white p-4 rounded-xl shadow-2xl z-50 transition-all duration-300 transform translate-y-10 opacity-0">
+        <div class="flex items-center gap-2">
+            <span id="toast-icon">ℹ️</span>
+            <p id="toast-message" class="text-sm font-semibold"></p>
+        </div>
+    </div>
+
+    <audio id="audio-player"></audio>
 
     <script>
-        // Tạo ID duy nhất chạy độc lập ngoại tuyến
-        function generateUniqueId() {
-            return 'task-' + Math.random().toString(36).substring(2, 9) + '-' + Date.now().toString(36);
+        const SETUP_TASK_ID = 'setup-task-fixed';
+        
+        let timerInterval = null;
+        let countdownInterval = null;
+        let flowQueue = [];
+        let completedTasks = { q1: 0, q2: 0 };
+        let totalTasks = { q1: 0, q2: 0 };
+        
+        const audioPlayer = document.getElementById('audio-player');
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'vov-saved-tasks';
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let inMemoryTasks = []; 
+
+        let currentPhase = null;
+        let currentTask = null;
+        let currentTimerTimeLeft = 0;
+        let lastTriggeredFixedMinute = "";
+
+        const DB_NAME = "RingtoneStorageDB";
+        const STORE_NAME = "sounds";
+        const DB_VERSION = 1;
+
+        function initIndexedDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME);
+                    }
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
         }
 
-        // 10 bài rèn luyện mặc định của Q2
-        const defaultQ2Tasks = [
-            "Quán Âm 3 tiếng",
-            "Phụng sự 30'",
-            "Luyện hơi - Luyện thanh",
-            "DC xoang",
-            "DC suy thận",
-            "DC tổ đĩa",
-            "DC tỳ - ổ bụng",
-            "Khai khớp",
-            "Giải cơ",
-            "Thông kinh"
-        ];
+        async function saveRingtoneToDB(fileBlob) {
+            try {
+                const db = await initIndexedDB();
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                store.put(fileBlob, 'user_ringtone_file');
+                return new Promise((resolve, reject) => {
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = (e) => reject(e.target.error);
+                });
+            } catch (e) {
+                console.error("Lỗi khi lưu nhạc chuông vào IndexedDB:", e);
+            }
+        }
 
-        let state = {
-            last_date: getTodayDateString(),
-            q1: [],
-            q2: defaultQ2Tasks.map(title => ({ id: generateUniqueId(), title, done: false }))
+        async function loadRingtoneFromDB() {
+            try {
+                const db = await initIndexedDB();
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.get('user_ringtone_file');
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (e) => reject(e.target.error);
+                });
+            } catch (e) {
+                console.error("Lỗi khi đọc nhạc chuông từ IndexedDB:", e);
+                return null;
+            }
+        }
+
+        function ensureSetupTask() {
+            const listQ1 = document.getElementById('list-q1');
+            if (!document.getElementById(SETUP_TASK_ID)) {
+                const li = document.createElement('li');
+                li.className = "task-item text-sm";
+                li.id = SETUP_TASK_ID;
+                li.dataset.id = SETUP_TASK_ID;
+                li.dataset.seconds = "0";
+                li.dataset.quad = "q1";
+                li.dataset.title = "Cài đặt nhiệm vụ";
+                li.dataset.fixedTime = "";
+                li.dataset.isSetupTask = "true";
+                
+                li.innerHTML = `
+                    <span class="task-content text-red-600 font-medium">Cài đặt nhiệm vụ<span class="fixed-time-label text-indigo-500 font-mono text-[11px]"></span></span>
+                    <div class="task-actions">
+                        <span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${SETUP_TASK_ID}')">🕒</span>
+                        <span class="action-icon star-icon text-amber-500">★</span>
+                    </div>`;
+                
+                listQ1.insertBefore(li, listQ1.firstChild);
+                saveSetupTaskToStorage();
+            }
+        }
+        
+        async function saveSetupTaskToStorage() {
+            const task = {
+                id: SETUP_TASK_ID,
+                title: "Cài đặt nhiệm vụ",
+                seconds: 0,
+                quad: "q1",
+                fixedTime: "",
+                isSetupTask: true
+            };
+            
+            if (currentUser && db) {
+                try {
+                    const docPath = `artifacts/${appId}/users/${currentUser.uid}/tasks/${SETUP_TASK_ID}`;
+                    await db.doc(docPath).set(task);
+                } catch (e) {
+                    console.error("Lỗi Firestore:", e);
+                }
+            } else {
+                const index = inMemoryTasks.findIndex(t => t.id === SETUP_TASK_ID);
+                if (index === -1) {
+                    inMemoryTasks.push(task);
+                }
+            }
+        }
+
+        window.onload = async () => { 
+            calculateTime(); 
+            setInterval(calculateTime, 1000); 
+            await initFirebase();
+            ensureSetupTask();
+
+            const savedAudioBlob = await loadRingtoneFromDB();
+            if (savedAudioBlob) {
+                audioPlayer.src = URL.createObjectURL(savedAudioBlob);
+                showToast("Đã khôi phục nhạc chuông từ bộ nhớ trình duyệt!", "🎵");
+            }
         };
 
-        function getTodayDateString() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const date = String(now.getDate()).padStart(2, '0');
-            return year + '-' + month + '-' + date;
-        }
+        async function initFirebase() {
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                try {
+                    const firebaseConfig = JSON.parse(__firebase_config);
+                    firebase.initializeApp(firebaseConfig);
+                    db = firebase.firestore();
+                    auth = firebase.auth();
 
-        // Tải trạng thái lưu trữ an toàn chống treo
-        function loadState() {
-            try {
-                const saved = localStorage.getItem('eisenhower_tasks');
-                const todayStr = getTodayDateString();
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    // Tự động kiểm tra để dọn dẹp ngày cũ
-                    if (parsed.last_date !== todayStr) {
-                        resetToDefaultState();
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await auth.signInWithCustomToken(__initial_auth_token);
                     } else {
-                        state = parsed;
+                        await auth.signInAnonymously();
                     }
-                } else {
-                    resetToDefaultState();
+
+                    auth.onAuthStateChanged((user) => {
+                        currentUser = user;
+                        if (user) {
+                            loadSavedTasksFirestore().then(() => {
+                                ensureSetupTask();
+                                checkActiveFlow();
+                            });
+                        } else {
+                            loadSavedTasksMemory();
+                            ensureSetupTask();
+                            checkActiveFlow();
+                        }
+                    });
+                } catch (e) {
+                    console.error("Lỗi khởi tạo Firebase, chuyển sang chế độ offline:", e);
+                    loadSavedTasksMemory();
+                    ensureSetupTask();
+                    checkActiveFlow();
                 }
-            } catch (e) {
-                console.warn("LocalStorage bị chặn, lưu trên RAM tạm thời.");
+            } else {
+                loadSavedTasksMemory();
+                ensureSetupTask();
+                checkActiveFlow();
             }
         }
 
-        function saveState() {
+        function showToast(message, icon = "ℹ️") {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-message').innerText = message;
+            document.getElementById('toast-icon').innerText = icon;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 50);
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        async function handleAudioUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                audioPlayer.src = URL.createObjectURL(file);
+                await saveRingtoneToDB(file); 
+                showToast("Đã tải và lưu trữ thành công nhạc chuông vào bộ nhớ máy!", "🎵");
+            }
+        }
+
+        function playChime() {
             try {
-                state.last_date = getTodayDateString();
-                localStorage.setItem('eisenhower_tasks', JSON.stringify(state));
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                
+                const playTone = (freq, delay, duration) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + delay);
+                    gain.gain.setValueAtTime(0, now + delay);
+                    gain.gain.linearRampToValueAtTime(0.4, now + delay + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + duration);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + duration);
+                };
+
+                playTone(523.25, 0, 1.5);
+                playTone(659.25, 0.2, 1.5);
+                playTone(783.99, 0.4, 2.0);
+                playTone(1046.50, 0.6, 2.5);
             } catch (e) {
-                console.warn("Không thể lưu LocalStorage.");
+                console.error("Bộ tạo âm thanh lỗi:", e);
             }
         }
 
-        function resetToDefaultState() {
-            state = {
-                last_date: getTodayDateString(),
-                q1: [],
-                q2: defaultQ2Tasks.map(title => ({ id: generateUniqueId(), title, done: false }))
-            };
-            saveState();
-            render();
+        function playCustomRingtone() {
+            if (audioPlayer.src) {
+                audioPlayer.currentTime = 0;
+                audioPlayer.play().catch(e => {
+                    console.error("Lỗi phát nhạc chuông MP3:", e);
+                });
+            }
+        }
+        
+        function stopCustomRingtone() {
+            if (audioPlayer.src) {
+                audioPlayer.pause();
+                audioPlayer.currentTime = 0;
+            }
         }
 
-        // Render Giao diện danh sách
-        function render() {
-            renderQuadrant('q1', 'list-q1', 'count-q1');
-            renderQuadrant('q2', 'list-q2', 'count-q2');
-        }
-
-        function renderQuadrant(quadKey, listId, countId) {
-            const listEl = document.getElementById(listId);
-            const countEl = document.getElementById(countId);
-            const items = state[quadKey] || [];
+        function updateProgressDisplay() {
+            const progressQ1 = document.getElementById('progress-q1');
+            const progressQ2 = document.getElementById('progress-q2');
             
-            const doneCount = items.filter(function(i) { return i.done; }).length;
-            countEl.textContent = doneCount + '/' + items.length;
+            if (progressQ1) {
+                progressQ1.innerHTML = `🔥 ${completedTasks.q1}/${totalTasks.q1}`;
+            }
+            if (progressQ2) {
+                progressQ2.innerHTML = `⭐ ${completedTasks.q2}/${totalTasks.q2}`;
+            }
+        }
 
-            if (items.length === 0) {
-                listEl.innerHTML = '<li style="text-align: center; py: 12px; font-size: 11px; color: #94a3b8; font-style: italic; padding: 12px; background: #fafafa; border-radius: 10px; border: 1px solid #f1f5f9;">Không có nhiệm vụ nào.</li>';
+        function countTasksByQuad() {
+            totalTasks.q1 = 0;
+            totalTasks.q2 = 0;
+            
+            document.querySelectorAll('#list-q1 .task-item').forEach(item => {
+                if (item.dataset.id !== SETUP_TASK_ID && parseInt(item.dataset.seconds) > 0) {
+                    totalTasks.q1++;
+                }
+            });
+            
+            document.querySelectorAll('#list-q2 .task-item').forEach(item => {
+                if (parseInt(item.dataset.seconds) > 0) {
+                    totalTasks.q2++;
+                }
+            });
+            
+            completedTasks.q1 = 0;
+            completedTasks.q2 = 0;
+            
+            updateProgressDisplay();
+        }
+
+        function markTaskCompleted(quad) {
+            if (quad === 'q1') {
+                completedTasks.q1++;
+            } else if (quad === 'q2') {
+                completedTasks.q2++;
+            }
+            updateProgressDisplay();
+        }
+
+        async function loadSavedTasksFirestore() {
+            if (!currentUser || !db) return;
+            try {
+                const path = `artifacts/${appId}/users/${currentUser.uid}/tasks`;
+                const snapshot = await db.collection(path).get();
+                
+                document.getElementById('list-q1').innerHTML = '';
+                document.getElementById('list-q2').innerHTML = '';
+                
+                ensureSetupTask();
+
+                snapshot.forEach(doc => {
+                    if (doc.id === SETUP_TASK_ID) return;
+                    
+                    const task = doc.data();
+                    createTaskElement(task.title, task.seconds, task.quad, true, task.id, task.fixedTime || "");
+                });
+                calculateTime();
+            } catch (e) {
+                console.error("Lỗi khi tải dữ liệu từ Firestore:", e);
+                loadSavedTasksMemory();
+            }
+        }
+
+        function loadSavedTasksMemory() {
+            document.getElementById('list-q1').innerHTML = '';
+            document.getElementById('list-q2').innerHTML = '';
+            ensureSetupTask();
+            inMemoryTasks.forEach(task => {
+                if (task.id !== SETUP_TASK_ID) {
+                    createTaskElement(task.title, task.seconds, task.quad, true, task.id, task.fixedTime || "");
+                }
+            });
+            calculateTime();
+        }
+
+        async function saveTaskToStorage(task) {
+            if (task.id === SETUP_TASK_ID) {
+                await saveSetupTaskToStorage();
+                return;
+            }
+            
+            if (currentUser && db) {
+                try {
+                    const docPath = `artifacts/${appId}/users/${currentUser.uid}/tasks/${task.id}`;
+                    await db.doc(docPath).set(task);
+                    showToast("Đã lưu mục tiêu này lên Cloud!", "⭐");
+                } catch (e) {
+                    console.error("Lỗi Firestore:", e);
+                }
+            } else {
+                const index = inMemoryTasks.findIndex(t => t.id === task.id);
+                if (index !== -1) {
+                    inMemoryTasks[index] = task;
+                } else {
+                    inMemoryTasks.push(task);
+                }
+            }
+        }
+
+        async function removeTaskFromStorage(id) {
+            if (id === SETUP_TASK_ID) {
+                showToast("Không thể xóa nhiệm vụ cố định này!", "⚠️");
+                return;
+            }
+            
+            if (currentUser && db) {
+                try {
+                    const docPath = `artifacts/${appId}/users/${currentUser.uid}/tasks/${id}`;
+                    await db.doc(docPath).delete();
+                    showToast("Đã xóa mục tiêu khỏi Cloud!", "🗑️");
+                } catch (e) {
+                    console.error("Lỗi Firestore:", e);
+                }
+            } else {
+                inMemoryTasks = inMemoryTasks.filter(t => t.id !== id);
+            }
+        }
+
+        async function saveFlowState(isActive) {
+            const alarmMinutes = parseInt(document.getElementById('alarm-minutes').value) || 0;
+            const restMinutes = parseInt(document.getElementById('rest-minutes').value) || 0;
+            
+            const stateData = {
+                isActive,
+                flowQueue,
+                currentPhase,
+                currentTask,
+                phaseEndTime: isActive ? (Date.now() + (currentTimerTimeLeft * 1000)) : 0,
+                alarmMinutes,
+                restMinutes,
+                completedTasks,
+                totalTasks
+            };
+
+            if (currentUser && db) {
+                try {
+                    const docPath = `artifacts/${appId}/users/${currentUser.uid}/flow/state`;
+                    await db.doc(docPath).set(stateData);
+                } catch (e) {
+                    console.error("Lỗi khi lưu trạng thái Flow lên Firestore:", e);
+                }
+            }
+
+            if (isActive) {
+                sessionStorage.setItem('flowState', JSON.stringify(stateData));
+            } else {
+                sessionStorage.removeItem('flowState');
+            }
+        }
+
+        async function checkActiveFlow() {
+            let savedState = null;
+
+            if (currentUser && db) {
+                try {
+                    const docPath = `artifacts/${appId}/users/${currentUser.uid}/flow/state`;
+                    const docSnap = await db.doc(docPath).get();
+                    if (docSnap.exists) {
+                        const cloudState = docSnap.data();
+                        if (cloudState && cloudState.isActive) {
+                            savedState = cloudState;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Lỗi kiểm tra trạng thái Flow từ Cloud:", e);
+                }
+            }
+
+            if (!savedState) {
+                const localSession = sessionStorage.getItem('flowState');
+                if (localSession) {
+                    const parsed = JSON.parse(localSession);
+                    if (parsed && parsed.isActive) {
+                        savedState = parsed;
+                    }
+                }
+            }
+
+            if (savedState) {
+                if (savedState.completedTasks) {
+                    completedTasks = savedState.completedTasks;
+                }
+                if (savedState.totalTasks) {
+                    totalTasks = savedState.totalTasks;
+                }
+                updateProgressDisplay();
+                restoreFlow(savedState);
+            }
+        }
+
+        function restoreFlow(state) {
+            flowQueue = state.flowQueue || [];
+            currentPhase = state.currentPhase;
+            currentTask = state.currentTask;
+            
+            const alarmMinutes = state.alarmMinutes || 0;
+            const restMinutes = state.restMinutes || 0;
+            document.getElementById('alarm-minutes').value = alarmMinutes;
+            document.getElementById('rest-minutes').value = restMinutes;
+
+            const now = Date.now();
+            const diffMs = state.phaseEndTime - now;
+
+            if (diffMs > 0) {
+                toggleFlowUI(true);
+                updateDisplayForPhase(currentTask, currentPhase);
+                updateProgressDisplay();
+                
+                playChime();
+                if (currentPhase === "alarm" && audioPlayer.src) {
+                    playCustomRingtone();
+                }
+                
+                startTimer(Math.floor(diffMs / 1000), currentPhase);
+                showToast("Đang kết nối lại chu kỳ Flow kỷ luật!", "⏳");
+            } else {
+                const overdueSeconds = Math.floor(Math.abs(diffMs) / 1000);
+                fastForwardFlow(overdueSeconds);
+            }
+        }
+
+        function fastForwardFlow(overdueSeconds) {
+            let phase = currentPhase;
+            let task = currentTask;
+            const alarmSec = (parseInt(document.getElementById('alarm-minutes').value) || 0) * 60;
+            const restSec = (parseInt(document.getElementById('rest-minutes').value) || 0) * 60;
+
+            while (overdueSeconds >= 0) {
+                if (!task) {
+                    completeFlow();
+                    return;
+                }
+                if (phase === "task") {
+                    phase = "alarm";
+                    if (overdueSeconds < alarmSec) {
+                        currentPhase = phase;
+                        currentTask = task;
+                        toggleFlowUI(true);
+                        updateDisplayForPhase(task, phase);
+                        updateProgressDisplay();
+                        playChime();
+                        if (audioPlayer.src) {
+                            setTimeout(() => {
+                                if (currentPhase === "alarm") playCustomRingtone();
+                            }, 1800);
+                        }
+                        startTimer(alarmSec - overdueSeconds, phase);
+                        return;
+                    } else {
+                        overdueSeconds -= alarmSec;
+                    }
+                } else if (phase === "alarm") {
+                    phase = "rest";
+                    if (overdueSeconds < restSec) {
+                        currentPhase = phase;
+                        currentTask = task;
+                        toggleFlowUI(true);
+                        updateDisplayForPhase(task, phase);
+                        updateProgressDisplay();
+                        playChime();
+                        startTimer(restSec - overdueSeconds, phase);
+                        return;
+                    } else {
+                        overdueSeconds -= restSec;
+                    }
+                } else if (phase === "rest") {
+                    if (flowQueue.length > 0) {
+                        task = flowQueue.shift();
+                        phase = "task";
+                        if (overdueSeconds < task.seconds) {
+                            currentPhase = phase;
+                            currentTask = task;
+                            toggleFlowUI(true);
+                            updateDisplayForPhase(task, phase);
+                            updateProgressDisplay();
+                            playChime();
+                            startTimer(task.seconds - overdueSeconds, phase);
+                            return;
+                        } else {
+                            overdueSeconds -= task.seconds;
+                        }
+                    } else {
+                        completeFlow();
+                        return;
+                    }
+                }
+            }
+        }
+
+        function updateDisplayForPhase(task, phase) {
+            if (phase === "task") {
+                updateDisplay(task.title, task.quad);
+            } else if (phase === "alarm") {
+                updateDisplay("🔔");
+            } else if (phase === "rest") {
+                updateDisplay("🧘");
+            }
+        }
+
+        function calculateTime() {
+            const now = new Date();
+            const startHour = parseInt(document.getElementById('start-hour').value) || 0;
+            const startMinute = parseInt(document.getElementById('start-minute').value) || 0;
+            
+            const startTimeSeconds = startHour * 3600 + startMinute * 60;
+            const currentTimeSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+            
+            let remainingCycleSeconds = startTimeSeconds - currentTimeSeconds;
+            if (remainingCycleSeconds < 0) {
+                remainingCycleSeconds += 24 * 3600;
+            }
+
+            const flowCycleRemaining = document.getElementById('flow-cycle-remaining');
+            const flowCycleBar = document.getElementById('flow-cycle-bar');
+            if (flowCycleRemaining && flowCycleBar) {
+                flowCycleRemaining.innerText = formatTime(remainingCycleSeconds);
+                const percentage = (remainingCycleSeconds / 86400) * 100;
+                flowCycleBar.style.width = `${percentage}%`;
+            }
+
+            let secondsSinceStart = currentTimeSeconds - startTimeSeconds;
+            if (secondsSinceStart < 0) secondsSinceStart += 24 * 3600;
+            
+            const totalCycleSeconds = 24 * 3600;
+            let totalTaskUsed = 0;
+            const restMin = parseInt(document.getElementById('rest-minutes').value) || 0;
+            const alarmMin = parseInt(document.getElementById('alarm-minutes').value) || 0;
+            document.querySelectorAll('.task-item').forEach(item => totalTaskUsed += parseInt(item.dataset.seconds) + (restMin * 60) + (alarmMin * 60));
+            
+            document.getElementById('time-remaining').innerText = formatTime(Math.max(0, totalCycleSeconds - secondsSinceStart - totalTaskUsed));
+
+            checkFixedTimeTriggers();
+        }
+
+        let activeTaskIdForTime = null;
+
+        function openTimePicker(taskId) {
+            activeTaskIdForTime = taskId;
+            const item = document.querySelector(`[data-id="${taskId}"]`);
+            const hintEl = document.getElementById('time-picker-hint');
+            
+            if (item) {
+                const isSetupTask = item.dataset.isSetupTask === "true";
+                const startHour = parseInt(document.getElementById('start-hour').value) || 21;
+                const startMinute = parseInt(document.getElementById('start-minute').value) || 0;
+                
+                if (isSetupTask) {
+                    let minHour = startHour - 1;
+                    if (minHour < 0) minHour += 24;
+                    
+                    const minTimeFormatted = `${String(minHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
+                    hintEl.innerHTML = `Nhiệm vụ sẽ chạy trong khoảng: <br><strong>${minTimeFormatted} - 23:59</strong>`;
+                } else {
+                    hintEl.innerHTML = "Nhiệm vụ sẽ tự động chạy chính xác tại thời điểm được cài đặt.";
+                }
+                
+                const fixedTime = item.dataset.fixedTime || "";
+                if (fixedTime) {
+                    const [h, m] = fixedTime.split(':');
+                    document.getElementById('picker-hour').value = parseInt(h);
+                    document.getElementById('picker-minute').value = parseInt(m);
+                } else {
+                    document.getElementById('picker-hour').value = "";
+                    document.getElementById('picker-minute').value = "";
+                }
+            }
+            document.getElementById('time-picker-modal').classList.remove('hidden');
+        }
+
+        function closeTimePicker() {
+            document.getElementById('time-picker-modal').classList.add('hidden');
+            activeTaskIdForTime = null;
+        }
+
+        function clearPickerTime() {
+            if (!activeTaskIdForTime) return;
+            updateTaskFixedTime(activeTaskIdForTime, "");
+            closeTimePicker();
+            showToast("Đã hủy giờ chạy cố định cho nhiệm vụ!", "🗑️");
+        }
+
+        function savePickerTime() {
+            if (!activeTaskIdForTime) return;
+            const h = parseInt(document.getElementById('picker-hour').value);
+            const m = parseInt(document.getElementById('picker-minute').value);
+            
+            if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) {
+                showToast("Vui lòng nhập đầy đủ giờ (0-23) và phút (0-59) hợp lệ!", "⚠️");
+                return;
+            }
+            
+            const item = document.querySelector(`[data-id="${activeTaskIdForTime}"]`);
+            const isSetupTask = item && item.dataset.isSetupTask === "true";
+            
+            if (isSetupTask) {
+                const startHour = parseInt(document.getElementById('start-hour').value) || 21;
+                const startMinute = parseInt(document.getElementById('start-minute').value) || 0;
+                
+                let minHour = startHour - 1;
+                if (minHour < 0) minHour += 24;
+                const minMinutes = minHour * 60 + startMinute;
+                
+                const maxMinutes = 23 * 60 + 59;
+                const targetMinutes = h * 60 + m;
+                
+                if (targetMinutes < minMinutes || targetMinutes > maxMinutes) {
+                    const minTimeFormatted = `${String(minHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
+                    showToast(`Nhiệm vụ "Cài đặt nhiệm vụ" chỉ được đặt trong khoảng ${minTimeFormatted} - 23:59!`, "⚠️");
+                    return;
+                }
+            }
+            
+            const formattedTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            updateTaskFixedTime(activeTaskIdForTime, formattedTime);
+            closeTimePicker();
+            showToast(`Đặt giờ cố định thành công: ${formattedTime}`, "⏰");
+        }
+
+        function updateTaskFixedTime(id, fixedTime) {
+            const item = document.querySelector(`[data-id="${id}"]`);
+            if (item) {
+                item.dataset.fixedTime = fixedTime;
+                const label = item.querySelector('.fixed-time-label');
+                if (label) {
+                    label.innerHTML = fixedTime ? ` ⏰ ${fixedTime}` : "";
+                }
+                const clockIcon = item.querySelector('.clock-icon');
+                if (clockIcon) {
+                    clockIcon.className = `action-icon clock-icon ${fixedTime ? 'text-indigo-600 font-bold' : 'text-slate-400'}`;
+                }
+                
+                const isSetupTask = item.dataset.isSetupTask === "true";
+                const starIcon = item.querySelector('.star-icon');
+                const isSaved = isSetupTask || (starIcon && starIcon.innerText === '★');
+                
+                if (isSaved) {
+                    saveTaskToStorage({
+                        id: id,
+                        title: item.dataset.title,
+                        seconds: parseInt(item.dataset.seconds),
+                        quad: item.dataset.quad,
+                        fixedTime: fixedTime,
+                        isSetupTask: isSetupTask
+                    });
+                }
+                calculateTime();
+            }
+        }
+
+        function checkFixedTimeTriggers() {
+            const now = new Date();
+            const currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            if (currentHHMM === lastTriggeredFixedMinute) return;
+
+            const items = document.querySelectorAll('.task-item');
+            let matchedTask = null;
+
+            items.forEach(item => {
+                if (item.dataset.fixedTime === currentHHMM) {
+                    matchedTask = {
+                        id: item.dataset.id,
+                        title: item.dataset.title,
+                        seconds: parseInt(item.dataset.seconds),
+                        quad: item.dataset.quad,
+                        fixedTime: item.dataset.fixedTime,
+                        isSetupTask: item.dataset.isSetupTask === "true"
+                    };
+                }
+            });
+
+            if (matchedTask) {
+                lastTriggeredFixedMinute = currentHHMM;
+                
+                if (matchedTask.isSetupTask) {
+                    triggerSetupTask(matchedTask);
+                } else {
+                    triggerFixedTask(matchedTask);
+                }
+            }
+        }
+
+        function triggerSetupTask(task) {
+            stopCustomRingtone();
+            showToast(`⏰ Đến giờ cài đặt nhiệm vụ: ${task.fixedTime}!`, "📋");
+            showCountdownUI();
+        }
+
+        function showCountdownUI() {
+            const countdownUi = document.getElementById('countdown-ui');
+            const mainUi = document.getElementById('main-ui');
+            const flowUi = document.getElementById('flow-ui');
+            
+            mainUi.classList.add('hidden');
+            flowUi.classList.add('hidden');
+            countdownUi.classList.remove('hidden');
+            
+            startCountdown();
+        }
+
+        function startCountdown() {
+            clearInterval(countdownInterval);
+            
+            const startHour = parseInt(document.getElementById('start-hour').value) || 21;
+            const startMinute = parseInt(document.getElementById('start-minute').value) || 0;
+            const now = new Date();
+            
+            let targetTime = new Date(now);
+            targetTime.setHours(startHour, startMinute, 0, 0);
+            
+            if (now >= targetTime) {
+                document.getElementById('countdown-display').innerText = '00:00:00';
+                document.getElementById('countdown-status').innerText = 'Đã đến giờ bắt đầu! Hãy cài đặt nhiệm vụ và bắt đầu.';
+                return;
+            }
+            
+            document.getElementById('countdown-status').innerText = 'Đang chờ đến giờ bắt đầu...';
+            
+            countdownInterval = setInterval(() => {
+                const currentTime = new Date();
+                const diffSeconds = Math.floor((targetTime - currentTime) / 1000);
+                
+                if (diffSeconds <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdown-display').innerText = '00:00:00';
+                    document.getElementById('countdown-status').innerText = 'Đã đến giờ bắt đầu! Hãy cài đặt nhiệm vụ và bắt đầu.';
+                } else {
+                    document.getElementById('countdown-display').innerText = formatTime(diffSeconds);
+                }
+            }, 1000);
+        }
+
+        function goToSetupTasks() {
+            const countdownUi = document.getElementById('countdown-ui');
+            const mainUi = document.getElementById('main-ui');
+            const flowUi = document.getElementById('flow-ui');
+            
+            countdownUi.classList.add('hidden');
+            mainUi.classList.remove('hidden');
+            flowUi.classList.add('hidden');
+            
+            document.getElementById('task-q1').focus();
+            showToast("Hãy thêm các nhiệm vụ cần thực hiện!", "📋");
+            sessionStorage.setItem('setupTaskActive', 'true');
+        }
+
+        function cancelCountdown() {
+            clearInterval(countdownInterval);
+            
+            const countdownUi = document.getElementById('countdown-ui');
+            const mainUi = document.getElementById('main-ui');
+            
+            countdownUi.classList.add('hidden');
+            mainUi.classList.remove('hidden');
+            
+            sessionStorage.removeItem('setupTaskActive');
+        }
+
+        function triggerFixedTask(task) {
+            stopCustomRingtone();
+            showToast(`⏰ Đúng giờ cố định: ${task.fixedTime}! Bắt đầu: ${task.title}`, "🔔");
+            
+            const flowUi = document.getElementById('flow-ui');
+            if (flowUi.classList.contains('hidden')) {
+                toggleFlowUI(true);
+            }
+            
+            clearInterval(timerInterval);
+            currentTask = task;
+            currentPhase = "task";
+            updateDisplay(currentTask.title, currentTask.quad);
+            
+            playChime();
+            
+            const taskTime = task.seconds > 0 ? task.seconds : 5;
+            startTimer(taskTime, "task");
+        }
+
+        function addTask(quad) {
+            const input = document.getElementById('task-' + quad);
+            if (!input.value.trim()) return;
+            const h = parseInt(document.getElementById('h-' + quad).value) || 0;
+            const m = parseInt(document.getElementById('m-' + quad).value) || 0;
+            const s = parseInt(document.getElementById('s-' + quad).value) || 0;
+            const totalSeconds = h * 3600 + m * 60 + s;
+            const id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+            createTaskElement(input.value, totalSeconds, quad, false, id, "");
+            input.value = '';
+            document.getElementById('h-' + quad).value = '';
+            document.getElementById('m-' + quad).value = '';
+            document.getElementById('s-' + quad).value = '';
+            calculateTime();
+        }
+
+        function createTaskElement(title, seconds, quad, isSaved, id, fixedTime) {
+            const li = document.createElement('li');
+            li.className = "task-item text-sm";
+            li.dataset.id = id;
+            li.dataset.seconds = seconds;
+            li.dataset.quad = quad;
+            li.dataset.title = title;
+            li.dataset.fixedTime = fixedTime || "";
+            
+            const timeLabelHTML = fixedTime ? ` <span class="fixed-time-label text-indigo-500 font-mono text-[11px]">⏰ ${fixedTime}</span>` : `<span class="fixed-time-label text-indigo-500 font-mono text-[11px]"></span>`;
+            const clockColorClass = fixedTime ? 'text-indigo-600 font-bold' : 'text-slate-400';
+
+            li.innerHTML = `<span class="task-content text-slate-700 font-medium">${title} ${seconds > 0 ? `<small class="text-slate-400 ml-2 font-mono">${formatTime(seconds)}</small>` : ''}${timeLabelHTML}</span>
+            <div class="task-actions">
+                <span class="action-icon clock-icon ${clockColorClass}" onclick="openTimePicker('${id}')">🕒</span>
+                <span class="action-icon star-icon text-amber-500" onclick="toggleSave(this,'${id}','${title}',${seconds},'${quad}')">${isSaved ? '★' : '☆'}</span>
+                <span class="action-icon text-red-400" onclick="deleteTask(this,'${id}')">🗑️</span>
+            </div>`;
+            document.getElementById('list-' + quad).appendChild(li);
+        }
+
+        function toggleSave(el, id, title, seconds, quad) {
+            if (id === SETUP_TASK_ID) {
+                showToast("Nhiệm vụ này luôn được lưu!", "ℹ️");
+                return;
+            }
+            
+            const item = document.querySelector(`[data-id="${id}"]`);
+            const fixedTime = item ? (item.dataset.fixedTime || "") : "";
+            if (el.innerText === '☆') { 
+                el.innerText = '★'; 
+                saveTaskToStorage({id, title, seconds, quad, fixedTime}); 
+            } else { 
+                el.innerText = '☆'; 
+                removeTaskFromStorage(id); 
+            }
+        }
+
+        function deleteTask(el, id) { 
+            if (id === SETUP_TASK_ID) {
+                showToast("Không thể xóa nhiệm vụ cố định này!", "⚠️");
+                return;
+            }
+            el.parentElement.parentElement.remove(); 
+            removeTaskFromStorage(id); 
+            calculateTime(); 
+        }
+
+        function startFullFlow() {
+            const countdownUi = document.getElementById('countdown-ui');
+            const isFromCountdown = !countdownUi.classList.contains('hidden') || sessionStorage.getItem('setupTaskActive') === 'true';
+            
+            if (isFromCountdown) {
+                sessionStorage.removeItem('setupTaskActive');
+                
+                const startHour = parseInt(document.getElementById('start-hour').value) || 21;
+                const startMinute = parseInt(document.getElementById('start-minute').value) || 0;
+                const now = new Date();
+                let targetTime = new Date(now);
+                targetTime.setHours(startHour, startMinute, 0, 0);
+                
+                if (now >= targetTime) {
+                    countdownUi.classList.add('hidden');
+                    startFullFlowImmediately();
+                } else {
+                    countdownUi.classList.remove('hidden');
+                    showCountdownUI();
+                    showToast("Đã lưu nhiệm vụ! Flow sẽ tự động bắt đầu khi đến giờ.", "⏰");
+                    
+                    const diffMs = targetTime - now;
+                    setTimeout(() => {
+                        if (!countdownUi.classList.contains('hidden')) {
+                            countdownUi.classList.add('hidden');
+                            startFullFlowImmediately();
+                        }
+                    }, diffMs);
+                }
+                return;
+            }
+            
+            startFullFlowImmediately();
+        }
+        
+        function startFullFlowImmediately() {
+            countTasksByQuad();
+            
+            flowQueue = [];
+            document.querySelectorAll('.task-item').forEach(item => {
+                if (item.dataset.id === SETUP_TASK_ID) return;
+                
+                const seconds = parseInt(item.dataset.seconds);
+                const fixedTime = item.dataset.fixedTime || "";
+                if (seconds > 0 && !fixedTime) {
+                    flowQueue.push({ title: item.dataset.title, seconds, quad: item.dataset.quad, fixedTime: "" });
+                }
+            });
+
+            const hasOtherTasks = Array.from(document.querySelectorAll('.task-item')).some(item => 
+                item.dataset.id !== SETUP_TASK_ID && parseInt(item.dataset.seconds) > 0
+            );
+            
+            if (!hasOtherTasks) {
+                showToast("Hãy tạo ít nhất một nhiệm vụ (ngoài nhiệm vụ cố định) để chạy Flow!", "⚠️");
                 return;
             }
 
-            listEl.innerHTML = items.map(function(item) {
-                const doneClass = item.done ? 'done' : '';
-                const checkedAttr = item.done ? 'checked' : '';
-                return '<li class="task-item">' +
-                    '<label class="task-label">' +
-                        '<input type="checkbox" ' + checkedAttr + ' onchange="toggleTask(\'' + quadKey + '\', \'' + item.id + '\')" class="task-checkbox">' +
-                        '<span class="task-text ' + doneClass + '">' + item.title + '</span>' +
-                    '</label>' +
-                    '<button onclick="deleteTask(\'' + quadKey + '\', \'' + item.id + '\')" class="delete-btn">' +
-                        '<svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
-                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>' +
-                        '</svg>' +
-                    '</button>' +
-                '</li>';
-            }).join('');
-        }
-
-        // Tích chọn nhiệm vụ
-        window.toggleTask = function(quadKey, id) {
-            const task = state[quadKey].find(function(item) { return item.id === id; });
-            if (task) {
-                task.done = !task.done;
-                saveState();
-                render();
+            if (flowQueue.length > 0) {
+                toggleFlowUI(true);
+                runNextTask();
+            } else {
+                showToast("Các nhiệm vụ đều đã hẹn giờ cố định. Hệ thống sẽ tự động kích hoạt khi đến giờ!", "⏰");
             }
         }
 
-        // Thêm nhiệm vụ phát sinh mới
-        window.addTask = function(quadKey) {
-            const inputEl = document.getElementById('input-' + quadKey);
-            const title = inputEl.value.trim();
-            if (!title) return;
-
-            state[quadKey].push({
-                id: generateUniqueId(),
-                title: title,
-                done: false
-            });
-
-            inputEl.value = '';
-            saveState();
-            render();
-            showToast("Đã thêm rèn luyện!");
+        function updateDisplay(text, quad = null) {
+            const label = document.getElementById('display-name');
+            label.innerText = text;
+            label.className = "font-black uppercase tracking-widest text-center text-4xl leading-tight gold-shimmer";
+            if (quad === 'q1') label.classList.add('text-red-500');
+            else if (quad === 'q2') label.classList.add('text-emerald-500');
+            else label.classList.add('text-amber-500');
         }
 
-        // Xoá nhiệm vụ rèn luyện
-        window.deleteTask = function(quadKey, id) {
-            state[quadKey] = state[quadKey].filter(function(item) { return item.id !== id; });
-            saveState();
-            render();
-            showToast("Đã xoá rèn luyện.");
-        }
-
-        // Đồng hồ cập nhật thời gian thực tế không trễ
-        function updateClock() {
-            const now = new Date();
+        function runNextTask() {
+            if (flowQueue.length === 0) { 
+                completeFlow(); 
+                return; 
+            }
+            stopCustomRingtone();
             
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
+            if (currentTask && currentTask.quad) {
+                markTaskCompleted(currentTask.quad);
+            }
             
-            const clockEl = document.getElementById('current-time');
-            if (clockEl) clockEl.textContent = hours + ':' + minutes + ':' + seconds;
+            currentTask = flowQueue.shift();
+            currentPhase = "task";
+            updateDisplay(currentTask.title, currentTask.quad);
+            playChime();
+            startTimer(currentTask.seconds, "task");
+        }
 
-            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-            const dayName = days[now.getDay()];
-            const date = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
+        function skipTask() {
+            stopCustomRingtone();
+            showToast(`Đã bỏ qua nhiệm vụ: ${currentTask ? currentTask.title : ''}`, "⏭️");
             
-            const dateEl = document.getElementById('current-date');
-            if (dateEl) dateEl.textContent = dayName + ', ' + date + '/' + month;
+            if (currentTask && currentTask.quad) {
+                markTaskCompleted(currentTask.quad);
+            }
+            
+            if (flowQueue.length === 0) {
+                completeFlow();
+                return;
+            }
+            runNextTask();
+        }
 
-            // Tự động kiểm tra reset qua ngày mới nếu điện thoại treo
-            const todayStr = getTodayDateString();
-            if (state.last_date && state.last_date !== todayStr) {
-                resetToDefaultState();
-                showToast("Bắt đầu ngày rèn luyện mới!");
+        function runAlarmPeriod() {
+            if (currentTask && currentTask.quad && currentPhase === "task") {
+                markTaskCompleted(currentTask.quad);
+            }
+            
+            currentPhase = "alarm";
+            updateDisplay("🔔");
+            playChime();
+            
+            if (audioPlayer.src) {
+                setTimeout(() => {
+                    if (currentPhase === "alarm") playCustomRingtone();
+                }, 1800);
+            }
+            
+            startTimer((parseInt(document.getElementById('alarm-minutes').value) || 0) * 60, "alarm");
+        }
+
+        function runRestPeriod() {
+            stopCustomRingtone();
+            currentPhase = "rest";
+            updateDisplay("🧘");
+            playChime();
+            startTimer((parseInt(document.getElementById('rest-minutes').value) || 0) * 60, "rest");
+        }
+
+        function startTimer(total, mode) {
+            currentTimerTimeLeft = total;
+            document.getElementById('display-task').innerText = formatTime(currentTimerTimeLeft);
+            clearInterval(timerInterval);
+            saveFlowState(true);
+
+            timerInterval = setInterval(() => {
+                currentTimerTimeLeft--;
+                if (currentTimerTimeLeft < 0) {
+                    clearInterval(timerInterval);
+                    if (mode === "task") runAlarmPeriod();
+                    else if (mode === "alarm") runRestPeriod();
+                    else runNextTask();
+                } else {
+                    document.getElementById('display-task').innerText = formatTime(currentTimerTimeLeft);
+                }
+            }, 1000);
+        }
+
+        function completeFlow() {
+            if (currentTask && currentTask.quad && currentPhase === "task") {
+                markTaskCompleted(currentTask.quad);
+            }
+            
+            clearInterval(timerInterval);
+            stopCustomRingtone();
+            flowQueue = [];
+            currentTask = null;
+            currentPhase = null;
+            currentTimerTimeLeft = 0;
+            saveFlowState(false); 
+            toggleFlowUI(false);
+            showToast("Tuyệt vời! Bạn đã hoàn thành toàn bộ mục tiêu của ngày hôm nay!", "🎉");
+        }
+
+        function toggleFlowUI(show) { 
+            const mainUi = document.getElementById('main-ui');
+            const flowUi = document.getElementById('flow-ui');
+            const countdownUi = document.getElementById('countdown-ui');
+            
+            countdownUi.classList.add('hidden');
+            
+            if (show) {
+                mainUi.classList.add('hidden');
+                flowUi.classList.remove('hidden');
+                updateProgressDisplay();
+            } else {
+                mainUi.classList.remove('hidden');
+                flowUi.classList.add('hidden');
             }
         }
-
-        // Kích hoạt chế độ Widget trong suốt
-        window.enterWidgetMode = function() {
-            document.body.classList.add('widget-mode');
-            localStorage.setItem('widget_mode_active', 'true');
+        
+        function formatTime(s) {
+            const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+            return [h, m, sec].map(v => v.toString().padStart(2, '0')).join(':');
         }
-
-        window.exitWidgetMode = function() {
-            document.body.classList.remove('widget-mode');
-            localStorage.removeItem('widget_mode_active');
-        }
-
-        // Toast thông báo
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            if (toast) {
-                toast.textContent = message;
-                toast.style.display = 'block';
-                setTimeout(function() {
-                    toast.style.display = 'none';
-                }, 2000);
-            }
-        }
-
-        // Khởi động
-        window.onload = function() {
-            updateClock();
-            setInterval(updateClock, 1000);
-            loadState();
-
-            if (localStorage.getItem('widget_mode_active') === 'true') {
-                enterWidgetMode();
-            }
-            render();
-        };
     </script>
 </body>
 </html>
