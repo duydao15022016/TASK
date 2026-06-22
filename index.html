@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mục Tiêu Về Nhà & Flow</title>
+    <title>Mục Tiêu Về Nhà &amp; Flow</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -27,19 +27,20 @@
         /* ===== TASK ITEM - BỐ CỤC CHUẨN ===== */
         .task-item { 
             border-bottom: 1px solid #f1f5f9; 
-            padding: 10px 10px 10px 12px; 
+            padding: 8px 8px 8px 10px; 
             display: flex; 
-            align-items: flex-start;
+            align-items: center;
             cursor: grab; 
             user-select: none; 
             transition: all var(--transition-smooth); 
             border-radius: 10px; 
             position: relative; 
-            min-height: 48px;
-            gap: 8px;
+            min-height: 44px;
+            gap: 6px;
             background: white;
             margin: 2px 0;
             box-shadow: var(--task-shadow);
+            overflow: hidden;
         }
         .task-item:hover { box-shadow: var(--task-hover-shadow); }
         .task-item:last-child { border-bottom: none; }
@@ -52,13 +53,12 @@
             cursor: grab; 
             padding: 2px 0; 
             color: #cbd5e1; 
-            font-size: 1rem; 
+            font-size: 0.9rem; 
             flex-shrink: 0; 
-            width: 18px; 
+            width: 16px; 
             text-align: center; 
             line-height: 1.4;
             letter-spacing: -1px;
-            margin-top: 1px;
         }
         .task-item .drag-handle:hover { color: #6366f1; }
         
@@ -68,20 +68,20 @@
             min-width: 0;
             display: flex; 
             flex-direction: column; 
-            gap: 3px;
+            gap: 2px;
             padding: 0;
-            align-self: center;
+            overflow: hidden;
         }
         
-        /* Dòng 1: Tên nhiệm vụ - SÁT TRÁI, WRAP NẾU DÀI */
+        /* Dòng 1: Tên nhiệm vụ - SÁT TRÁI, TRUNCATE */
         .task-item .task-content .task-title-row { 
             font-weight: 600; 
             color: #1e293b; 
-            font-size: 0.8rem; 
+            font-size: 0.78rem; 
             line-height: 1.3;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            word-break: break-word;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             display: block;
             text-align: left;
         }
@@ -90,14 +90,15 @@
         .task-item .task-content .task-time-row { 
             display: flex; 
             align-items: center; 
-            gap: 6px; 
-            flex-wrap: wrap;
+            gap: 5px; 
+            flex-wrap: nowrap;
+            overflow: hidden;
         }
         
         .task-item .task-content .task-time-row .time-display { 
             font-family: 'SF Mono', 'Courier New', monospace; 
-            font-size: 0.68rem; 
-            font-weight: 600;
+            font-size: 0.7rem; 
+            font-weight: 700;
             color: #64748b; 
             white-space: nowrap;
             background: #f1f5f9;
@@ -106,25 +107,45 @@
             display: inline-flex;
             align-items: center;
             gap: 3px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
         }
         .task-item .task-content .task-time-row .time-display::before {
             content: "⏱";
             font-size: 0.6rem;
         }
         
+        /* Khi đang chạy - time-display biến thành countdown nhấp nháy */
+        .task-item.running .task-content .task-time-row .time-display {
+            color: #dc2626;
+            background: rgba(220,38,38,0.1);
+            border: 2px solid rgba(220,38,38,0.25);
+            animation: pulse-countdown 0.6s ease-in-out infinite;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+        }
+        .task-item.running .task-content .task-time-row .time-display::before {
+            content: "⏳";
+        }
+        @keyframes pulse-countdown { 
+            0%,100%{ transform: scale(1); opacity: 1; } 
+            50%{ transform: scale(1.04); opacity: 0.85; } 
+        }
+        
         .task-item .task-content .task-time-row .fixed-time-label { 
             font-family: 'SF Mono', 'Courier New', monospace; 
-            font-size: 0.68rem; 
+            font-size: 0.65rem; 
             font-weight: 600;
             color: #4f46e5; 
             white-space: nowrap;
             background: #eef2ff;
-            padding: 2px 8px;
+            padding: 2px 7px;
             border-radius: 6px;
             display: inline-flex;
             align-items: center;
             gap: 3px;
             border: 1px solid #c7d2fe;
+            flex-shrink: 0;
         }
         
         /* Task actions - LUÔN GÓC PHẢI, KHÔNG CO GIÃN */
@@ -133,11 +154,10 @@
             gap: 2px; 
             align-items: center; 
             flex-shrink: 0;
-            align-self: center;
         }
-        .task-actions-normal { min-width: 88px; justify-content: flex-end; }
-        .task-actions-wide { min-width: 112px; justify-content: flex-end; }
-        .task-actions-wider { min-width: 152px; justify-content: flex-end; }
+        .task-actions-normal { min-width: 84px; justify-content: flex-end; }
+        .task-actions-wide { min-width: 108px; justify-content: flex-end; }
+        .task-actions-wider { min-width: 148px; justify-content: flex-end; }
         
         /* Action icons */
         .action-icon { 
@@ -147,9 +167,9 @@
             display: inline-flex; 
             align-items: center; 
             justify-content: center; 
-            font-size: 0.85rem; 
-            width: 30px; 
-            height: 30px; 
+            font-size: 0.8rem; 
+            width: 28px; 
+            height: 28px; 
             flex-shrink: 0; 
             line-height: 1; 
             border-radius: 8px;
@@ -160,9 +180,9 @@
         
         /* Task time input nhỏ */
         .task-time-input { 
-            width: 36px; 
+            width: 34px; 
             padding: 2px 2px; 
-            font-size: 0.65rem; 
+            font-size: 0.62rem; 
             font-weight: 600;
             border: 2px solid #e2e8f0; 
             border-radius: 6px; 
@@ -217,6 +237,17 @@
         .setting-container .setting-unit { right: 6px; }
         .hero-flow-box { background: linear-gradient(135deg, #5d4037, #4e342e); border-radius: 1.2rem; padding: 0.85rem; margin-bottom: 0.75rem; text-align: center; color: #fffbeb; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
         
+        /* === STICKY HERO HEADER === */
+        .sticky-hero-wrapper {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .sticky-hero-wrapper .hero-flow-box {
+            margin-bottom: 0;
+            border-radius: 0 0 1.2rem 1.2rem;
+        }
+        
         /* Running */
         .task-item.running { animation: shimmer-bg 1.5s ease-in-out infinite !important; background: linear-gradient(135deg, #fffbeb, #fef3c7, #fffbeb) !important; background-size: 200% 200% !important; border-left: 4px solid #f59e0b !important; box-shadow: 0 0 20px rgba(245,158,11,0.25) !important; z-index: 10 !important; }
         @keyframes shimmer-bg { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
@@ -224,26 +255,22 @@
         /* Completed */
         .task-item.completed { background: #f8fafc !important; opacity: 0.7; border-left: 4px solid #cbd5e1 !important; }
         .task-item.completed .task-content .task-title-row { text-decoration: line-through !important; color: #94a3b8 !important; }
-        .task-item.completed .task-time-row .time-display { text-decoration: line-through !important; opacity: 0.5; }
+        .task-item.completed .task-time-row .time-display { text-decoration: line-through !important; opacity: 0.5; animation: none !important; border: none !important; }
         .task-item.completed .task-time-row .fixed-time-label { text-decoration: line-through !important; opacity: 0.5; }
         .task-item.completed .task-actions .action-icon { opacity: 0.3; pointer-events: none; }
         .task-item.completed .drag-handle { visibility: hidden !important; }
-        .task-item.completed .countdown-timer { display: none !important; }
         
         /* Checkbox */
         .complete-checkbox { display: none; position: absolute; left: -16px; top: 50%; transform: translateY(-50%) scale(0); width: 26px; height: 26px; border-radius: 50%; border: 2px solid #10b981; background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #059669; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; z-index: 5; transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease; opacity: 0; box-shadow: 0 2px 8px rgba(16,185,129,0.3); }
         .task-item.completed .complete-checkbox { display: inline-flex !important; opacity: 1 !important; transform: translateY(-50%) scale(1) !important; }
         
-        /* Countdown */
-        .task-item .countdown-timer { font-weight: 700; font-family: 'SF Mono', 'Courier New', monospace; font-size: 0.8rem; color: #dc2626; min-width: 58px; text-align: center; background: rgba(220,38,38,0.1); padding: 3px 8px; border-radius: 8px; margin-left: 6px; display: inline-block; border: 2px solid rgba(220,38,38,0.25); letter-spacing: 1px; white-space: nowrap; }
-        .task-item.running .countdown-timer { display: inline-block !important; animation: pulse-timer 0.6s ease-in-out infinite; }
-        @keyframes pulse-timer { 0%,100%{transform:scale(1);color:#dc2626} 50%{transform:scale(1.06);color:#b91c1c} }
+        /* Running state hides drag handle and disables actions */
         .task-item.running .drag-handle { visibility: hidden !important; }
         .task-item.running .task-actions .action-icon { opacity: 0.3; pointer-events: none; }
         
-        /* Phase overlay */
-        #phase-overlay { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 10px 24px; border-radius: 50px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
-        #phase-overlay.active { opacity: 1; }
+        /* Phase overlay - nằm trong sticky wrapper, dưới progress bar */
+        #phase-overlay { position: relative; top: auto; left: auto; transform: none; z-index: 92; pointer-events: none; display: none; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 10px 24px; border-radius: 50px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); margin: 4px auto; width: fit-content; }
+        #phase-overlay.active { display: flex; }
         #phase-overlay .phase-icon-big { font-size: 1.8rem; line-height: 1; }
         #phase-overlay .phase-icon-big.alarm-active { animation: bell-shake 0.5s ease-in-out infinite; }
         #phase-overlay .phase-icon-big.rest-active { animation: rest-float 2s ease-in-out infinite; }
@@ -255,51 +282,61 @@
         
         html { scroll-behavior: smooth; }
         
-        /* Fixed bar */
-        #progress-fixed-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 90; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 8px 16px; display: flex; justify-content: center; gap: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); opacity: 0; transform: translateY(-100%); transition: all 0.3s ease; }
-        #progress-fixed-bar.visible { opacity: 1; transform: translateY(0); }
+        /* Progress bar - nằm trong sticky wrapper, dưới hero header */
+        #progress-fixed-bar { position: relative; top: auto; left: auto; right: auto; z-index: 95; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 8px 16px; display: flex; justify-content: center; gap: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); max-width: 28rem; margin-left: auto; margin-right: auto; }
         #progress-fixed-bar .progress-badge-fixed { display: inline-flex; align-items: center; justify-content: center; min-width: 54px; padding: 5px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; font-family: 'SF Mono', 'Courier New', monospace; letter-spacing: 0.3px; }
         
         /* Toast */
         #custom-toast { backdrop-filter: blur(20px); background: rgba(15,23,42,0.95); }
         
+        /* Flow running lock - disable start button and hide skip */
+        .flow-locked #start-flow-btn { opacity: 0.5; pointer-events: none; cursor: not-allowed; }
+        .flow-locked #skip-task-btn { display: none !important; }
+        
         /* Responsive */
         @media (max-width: 380px) {
-            .task-item { padding: 8px 6px 8px 8px; gap: 5px; }
-            .task-item .task-content .task-title-row { font-size: 0.72rem; }
+            .task-item { padding: 7px 5px 7px 7px; gap: 4px; }
+            .task-item .task-content .task-title-row { font-size: 0.7rem; }
             .task-item .task-content .task-time-row .time-display { font-size: 0.6rem; padding: 2px 6px; }
-            .task-actions-normal { min-width: 78px; }
-            .task-actions-wide { min-width: 100px; }
-            .task-actions-wider { min-width: 135px; }
+            .task-item.running .task-content .task-time-row .time-display { font-size: 0.65rem; padding: 2px 7px; }
+            .task-actions-normal { min-width: 74px; }
+            .task-actions-wide { min-width: 96px; }
+            .task-actions-wider { min-width: 130px; }
             .action-icon { width: 26px; height: 26px; font-size: 0.75rem; }
-            .task-time-input { width: 32px; font-size: 0.6rem; }
-            .drag-handle { width: 16px; font-size: 0.9rem; }
+            .task-time-input { width: 30px; font-size: 0.58rem; }
+            .drag-handle { width: 14px; font-size: 0.85rem; }
         }
         @media (max-width: 320px) {
-            .task-item { padding: 6px 4px 6px 6px; gap: 4px; }
-            .task-item .task-content .task-title-row { font-size: 0.65rem; }
-            .task-actions-normal { min-width: 70px; }
-            .task-actions-wide { min-width: 90px; }
-            .task-actions-wider { min-width: 120px; }
-            .action-icon { width: 24px; height: 24px; font-size: 0.7rem; }
-            .task-time-input { width: 28px; font-size: 0.55rem; }
-            .drag-handle { width: 14px; font-size: 0.8rem; }
+            .task-item { padding: 6px 4px 6px 5px; gap: 3px; }
+            .task-item .task-content .task-title-row { font-size: 0.63rem; }
+            .task-item .task-content .task-time-row .time-display { font-size: 0.55rem; padding: 1px 5px; }
+            .task-item.running .task-content .task-time-row .time-display { font-size: 0.6rem; padding: 2px 6px; }
+            .task-actions-normal { min-width: 66px; }
+            .task-actions-wide { min-width: 86px; }
+            .task-actions-wider { min-width: 116px; }
+            .action-icon { width: 22px; height: 22px; font-size: 0.68rem; }
+            .task-time-input { width: 26px; font-size: 0.52rem; }
+            .drag-handle { width: 12px; font-size: 0.75rem; }
         }
     </style>
 </head>
-<body class="pb-6 pt-2">
-    <div id="phase-overlay"><span id="phase-overlay-icon" class="phase-icon-big">🔔</span><span id="phase-overlay-label" class="phase-label-big alarm-text">CHUÔNG BÁO</span><span id="phase-overlay-timer" class="phase-timer">00:00</span></div>
-    <div id="progress-fixed-bar"><div id="progress-fixed-q1" class="progress-badge-fixed bg-red-500/15 text-red-700 border border-red-500/40">🔥 0/0</div><div id="progress-fixed-q2" class="progress-badge-fixed bg-emerald-500/15 text-emerald-700 border border-emerald-500/40">⭐ 0/0</div></div>
+<body class="pb-6 pt-0">
+    <!-- STICKY HERO HEADER + PROGRESS BAR + PHASE OVERLAY -->
+    <div class="sticky-hero-wrapper">
+        <div class="hero-flow-box"><h1 class="text-5xl font-serif italic font-bold gold-metallic">Về Nhà</h1><div class="text-sm text-teal-300 font-semibold mt-1">💸 Thu Nhập Thụ Động</div><p class="text-[8px] md:text-[10px] text-stone-300 italic mt-1 uppercase tracking-tight whitespace-nowrap">💼 Massage Trị Liệu • 🎵 Hát Dân Ca &amp; Bolero • ✍️ Sáng Tác Nhạc</p></div>
+        <div id="progress-fixed-bar"><div id="progress-fixed-q1" class="progress-badge-fixed bg-red-500/15 text-red-700 border border-red-500/40">🔥 0/0</div><div id="progress-fixed-q2" class="progress-badge-fixed bg-emerald-500/15 text-emerald-700 border border-emerald-500/40">⭐ 0/0</div></div>
+        <div id="phase-overlay"><span id="phase-overlay-icon" class="phase-icon-big">🔔</span><span id="phase-overlay-label" class="phase-label-big alarm-text">CHUÔNG BÁO</span><span id="phase-overlay-timer" class="phase-timer">00:00</span></div>
+    </div>
+
     <div class="max-w-md mx-auto px-4" id="main-ui">
         <header class="flex flex-col compact-header text-center" id="main-header">
-            <div class="hero-flow-box"><h1 class="text-5xl font-serif italic font-bold gold-metallic">Về Nhà</h1><div class="text-sm text-teal-300 font-semibold mt-1">💸 Thu Nhập Thụ Động</div><p class="text-[8px] md:text-[10px] text-stone-300 italic mt-1 uppercase tracking-tight whitespace-nowrap">💼 Massage Trị Liệu • 🎵 Hát Dân Ca & Bolero • ✍️ Sáng Tác Nhạc</p></div>
             <div class="grid grid-cols-4 settings-grid">
                 <div><label class="setting-label">🎵</label><div class="file-input-wrapper"><input type="file" id="ringtone-upload" accept="audio/*,.mp3,.mpeg,.wav,.ogg,.aac,.m4a" onchange="handleAudioUpload(event)" capture><div class="file-input-button">📁 <span id="file-button-text">Chọn</span></div></div><div id="file-name-display" class="file-name"></div></div>
                 <div><label class="setting-label">GIỜ BẮT ĐẦU</label><div class="time-start-container"><input type="number" id="start-hour" value="21" min="0" max="23" onchange="calculateTime()" class="time-small-input"><span class="text-[8px] text-slate-400">:</span><input type="number" id="start-minute" value="0" min="0" max="59" onchange="calculateTime()" class="time-small-input"></div></div>
                 <div><label class="setting-label">🧘</label><div class="setting-container"><input type="number" id="rest-minutes" value="1" min="0" onchange="calculateTime()" class="setting-input"><span class="setting-unit">'</span></div></div>
                 <div><label class="setting-label">🔔</label><div class="setting-container"><input type="number" id="alarm-minutes" value="1" min="0" onchange="calculateTime()" class="setting-input"><span class="setting-unit">'</span></div></div>
             </div>
-            <button onclick="startFullFlow()" class="w-full bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all text-sm">🚀 BẮT ĐẦU</button>
+            <button id="start-flow-btn" onclick="startFullFlow()" class="w-full bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all text-sm">🚀 BẮT ĐẦU</button>
             <div class="bg-white border-2 border-indigo-50 time-remaining-box rounded-2xl text-center shadow-sm"><div class="time-remaining-text uppercase font-bold text-slate-400">⏳ Thời gian còn lại trong ngày</div><div id="time-remaining" class="time-remaining-number font-mono font-black">00:00:00</div></div>
             <div class="flex gap-3 justify-center mt-2" id="progress-inline"><div id="progress-q1" class="progress-badge bg-red-500/15 text-red-700 border border-red-500/40">🔥 0/0</div><div id="progress-q2" class="progress-badge bg-emerald-500/15 text-emerald-700 border border-emerald-500/40">⭐ 0/0</div></div>
         </header>
@@ -318,6 +355,10 @@
         const THONGKINH_TASK_ID = 'thongkinh-task-fixed';
         const CANBANG_AMDUONG_ID = 'canbang-amduong-fixed';
         const CANBANG_DOSHA_ID = 'canbang-dosha-fixed';
+        // Default tasks for Q2 (Thói Quen Quan Trọng)
+        const MASSAGE_TASK_ID = 'massage-trilieu-fixed';
+        const LUYENHAT_TASK_ID = 'luyen-hat-fixed';
+        const SANGTAC_TASK_ID = 'sangtac-nhac-fixed';
         const STORAGE_DATE_KEY = 'lastCleanupDate';
         let timerInterval = null;
         let flowQueue = [];
@@ -350,11 +391,16 @@
         async function loadRingtoneFromDB() { try { const db = await initIndexedDB(); const tx = db.transaction(STORE_NAME, 'readonly'); const store = tx.objectStore(STORE_NAME); const request = store.get('user_ringtone_file'); return new Promise((resolve, reject) => { request.onsuccess = () => resolve(request.result); request.onerror = (e) => reject(e.target.error); }); } catch (e) { return null; } }
         function updateAudioButtonDisplay() { const btn = document.getElementById('file-button-text'); if (hasAudioFile) { btn.innerHTML = '<span class="check-mark-green">✓</span>'; } else { btn.textContent = 'Chọn'; } }
         function getTodayDateString() { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`; }
-        function getOrCreateCountdownTimer(taskItem) { let t = taskItem.querySelector('.countdown-timer'); if (!t) { t = document.createElement('span'); t.className = 'countdown-timer'; t.style.display = 'none'; const tr = taskItem.querySelector('.task-time-row'); if (tr) tr.appendChild(t); else taskItem.appendChild(t); } return t; }
         function getOrCreateCheckbox(taskItem) { let c = taskItem.querySelector('.complete-checkbox'); if (!c) { c = document.createElement('span'); c.className = 'complete-checkbox'; c.innerHTML = '✓'; c.title = 'Đã hoàn thành'; taskItem.appendChild(c); } return c; }
         function getRemainingSeconds(ms) { return Math.max(0, Math.floor((ms - Date.now()) / 1000)); }
         function formatTime(s) { const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60; return [h,m,sec].map(v=>String(v).padStart(2,'0')).join(':'); }
         function formatTimeShort(s) { const m = Math.floor(s/60), sec = s%60; return [m,sec].map(v=>String(v).padStart(2,'0')).join(':'); }
+
+        /* Cập nhật time-display trực tiếp (gom countdown vào chung) */
+        function updateTimeDisplay(taskItem, timeText) {
+            const td = taskItem.querySelector('.time-display');
+            if (td) td.textContent = timeText;
+        }
 
         function updatePhaseOverlay(phase, endTimeMs) {
             const overlay = document.getElementById('phase-overlay');
@@ -377,7 +423,7 @@
         }
 
         function scrollToRunningTask(id) { if (!id) return; const el = document.querySelector(`[data-id="${id}"]`); if (el) { const r = el.getBoundingClientRect(); const st = window.pageYOffset || document.documentElement.scrollTop; window.scrollTo({ top: Math.max(0, r.top + st - window.innerHeight/2 + r.height/2), behavior: 'smooth' }); } }
-        function handleProgressBarVisibility() { const pi = document.getElementById('progress-inline'); const pf = document.getElementById('progress-fixed-bar'); if (!pi || !pf) return; if (pi.getBoundingClientRect().bottom < 0) pf.classList.add('visible'); else pf.classList.remove('visible'); }
+        function handleProgressBarVisibility() { /* Progress bar is now always visible inside sticky wrapper - no toggle needed */ }
         function updateAllProgressDisplays() { const t1 = `🔥 ${completedTasks.q1}/${totalTasks.q1}`, t2 = `⭐ ${completedTasks.q2}/${totalTasks.q2}`; ['progress-q1','progress-fixed-q1'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=t1;}); ['progress-q2','progress-fixed-q2'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=t2;}); }
         
         function initDragAndDrop(listId) { const list = document.getElementById(listId); if (!list) return; list.querySelectorAll('.task-item[draggable="true"]').forEach(item => { item.addEventListener('dragstart', handleDragStart); item.addEventListener('dragend', handleDragEnd); item.addEventListener('dragover', handleDragOver); item.addEventListener('dragenter', handleDragEnter); item.addEventListener('dragleave', handleDragLeave); item.addEventListener('drop', handleDrop); }); }
@@ -391,22 +437,32 @@
         function loadTaskOrder(quad) { try { return JSON.parse(localStorage.getItem('taskOrder-' + quad)); } catch(e) { return null; } }
         function sortTasksByOrder(quad) { const list = document.getElementById('list-' + quad); if (!list) return; const order = loadTaskOrder(quad); if (!order || !order.length) return; const items = Array.from(list.querySelectorAll('.task-item[draggable="true"]')); if (!items.length) return; const map = {}; items.forEach(i => { map[i.dataset.id] = i; i.remove(); }); order.forEach(id => { if (map[id]) list.appendChild(map[id]); }); items.forEach(i => { if (!order.includes(i.dataset.id) && !i.parentNode) list.appendChild(i); }); }
         
-        async function cleanupOldTasks() { const today = getTodayDateString(); if (localStorage.getItem(STORAGE_DATE_KEY) === today) return; const fixedIds = [SETUP_TASK_ID, GIAOLY_TASK_ID, QUANAM_TASK_ID, THONGKINH_TASK_ID, CANBANG_AMDUONG_ID, CANBANG_DOSHA_ID]; if (currentUser && db) { try { const snap = await db.collection(`artifacts/${appId}/users/${currentUser.uid}/tasks`).get(); const batch = db.batch(); let changed = false; snap.forEach(doc => { if (!fixedIds.includes(doc.id) && !doc.data().saved && !doc.data().isSetupTask) { batch.delete(doc.ref); changed = true; } }); if (changed) await batch.commit(); } catch(e) {} } inMemoryTasks = inMemoryTasks.filter(t => fixedIds.includes(t.id) || t.saved || t.isSetupTask); localStorage.setItem(STORAGE_DATE_KEY, today); }
+        async function cleanupOldTasks() { const today = getTodayDateString(); if (localStorage.getItem(STORAGE_DATE_KEY) === today) return; const fixedIds = [SETUP_TASK_ID, GIAOLY_TASK_ID, QUANAM_TASK_ID, THONGKINH_TASK_ID, CANBANG_AMDUONG_ID, CANBANG_DOSHA_ID, MASSAGE_TASK_ID, LUYENHAT_TASK_ID, SANGTAC_TASK_ID]; if (currentUser && db) { try { const snap = await db.collection(`artifacts/${appId}/users/${currentUser.uid}/tasks`).get(); const batch = db.batch(); let changed = false; snap.forEach(doc => { if (!fixedIds.includes(doc.id) && !doc.data().saved && !doc.data().isSetupTask) { batch.delete(doc.ref); changed = true; } }); if (changed) await batch.commit(); } catch(e) {} } inMemoryTasks = inMemoryTasks.filter(t => fixedIds.includes(t.id) || t.saved || t.isSetupTask); localStorage.setItem(STORAGE_DATE_KEY, today); }
 
         function ensureSetupTask() { const list = document.getElementById('list-q1'); if (!document.getElementById(SETUP_TASK_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = SETUP_TASK_ID; Object.assign(li.dataset, { id: SETUP_TASK_ID, seconds: "0", quad: "q1", title: "Cài đặt nhiệm vụ", fixedTime: "", isSetupTask: "true", saved: "true" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#dc2626">⚙️ Cài đặt nhiệm vụ</span><span class="task-time-row"><span class="time-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-normal"><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${SETUP_TASK_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; list.insertBefore(li, list.firstChild); saveFixedTask(SETUP_TASK_ID, "Cài đặt nhiệm vụ", 0, ""); } }
         function ensureGiaoLyTask() { const list = document.getElementById('list-q1'); if (!document.getElementById(GIAOLY_TASK_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = GIAOLY_TASK_ID; Object.assign(li.dataset, { id: GIAOLY_TASK_ID, seconds: "0", quad: "q1", title: "GIÁO LÝ 30'", fixedTime: "", isSetupTask: "true", saved: "true", giaolyMinutes: "0" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#0284c7">📖 GIÁO LÝ 30'</span><span class="task-time-row"><span class="time-display giaoly-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-wide"><input type="number" class="task-time-input" id="giaoly-minutes" value="0" min="0" max="120" placeholder="m" onchange="updateGiaoLyTime()"><span class="task-time-label">m</span><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${GIAOLY_TASK_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; const st = document.getElementById(SETUP_TASK_ID); if (st && st.nextSibling) list.insertBefore(li, st.nextSibling); else list.appendChild(li); saveFixedTask(GIAOLY_TASK_ID, "GIÁO LÝ 30'", 0, "", { giaolyMinutes: 0 }); } }
         function ensureQuanAmTask() { const list = document.getElementById('list-q1'); if (!document.getElementById(QUANAM_TASK_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = QUANAM_TASK_ID; Object.assign(li.dataset, { id: QUANAM_TASK_ID, seconds: "0", quad: "q1", title: "QUÁN ÂM 3H", fixedTime: "", isSetupTask: "true", saved: "true", quanamHours: "0", quanamMinutes: "0" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#d97706">🧘 QUÁN ÂM 3H</span><span class="task-time-row"><span class="time-display quanam-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-wider"><input type="number" class="task-time-input" id="quanam-hours" value="0" min="0" max="23" placeholder="h" onchange="updateQuanAmTime()"><span class="task-time-label">h</span><input type="number" class="task-time-input" id="quanam-minutes" value="0" min="0" max="59" placeholder="m" onchange="updateQuanAmTime()"><span class="task-time-label">m</span><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${QUANAM_TASK_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; const gt = document.getElementById(GIAOLY_TASK_ID); if (gt && gt.nextSibling) list.insertBefore(li, gt.nextSibling); else list.appendChild(li); saveFixedTask(QUANAM_TASK_ID, "QUÁN ÂM 3H", 0, "", { quanamHours: 0, quanamMinutes: 0 }); } }
-        function ensureThongKinhTask() { const list = document.getElementById('list-q1'); if (!document.getElementById(THONGKINH_TASK_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = THONGKINH_TASK_ID; Object.assign(li.dataset, { id: THONGKINH_TASK_ID, seconds: "0", quad: "q1", title: "THÔNG KINH", fixedTime: "", isSetupTask: "true", saved: "true", thongkinhMinutes: "0" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#e11d48">📿 THÔNG KINH</span><span class="task-time-row"><span class="time-display thongkinh-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-wide"><input type="number" class="task-time-input" id="thongkinh-minutes" value="0" min="0" max="120" placeholder="m" onchange="updateThongKinhTime()"><span class="task-time-label">m</span><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${THONGKINH_TASK_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; const qt = document.getElementById(QUANAM_TASK_ID); if (qt && qt.nextSibling) list.insertBefore(li, qt.nextSibling); else list.appendChild(li); saveFixedTask(THONGKINH_TASK_ID, "THÔNG KINH", 0, "", { thongkinhMinutes: 0 }); } }
-        function ensureCanBangAmDuongTask() { const list = document.getElementById('list-q1'); if (!document.getElementById(CANBANG_AMDUONG_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = CANBANG_AMDUONG_ID; Object.assign(li.dataset, { id: CANBANG_AMDUONG_ID, seconds: "0", quad: "q1", title: "CÂN BẰNG ÂM DƯƠNG", fixedTime: "", isSetupTask: "true", saved: "true", canbangAmduongMinutes: "0" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#7c3aed">☯️ CÂN BẰNG ÂM DƯƠNG</span><span class="task-time-row"><span class="time-display canbang-amduong-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-wide"><input type="number" class="task-time-input" id="canbang-amduong-minutes" value="0" min="0" max="120" placeholder="m" onchange="updateCanBangAmDuongTime()"><span class="task-time-label">m</span><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${CANBANG_AMDUONG_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; const tk = document.getElementById(THONGKINH_TASK_ID); if (tk && tk.nextSibling) list.insertBefore(li, tk.nextSibling); else list.appendChild(li); saveFixedTask(CANBANG_AMDUONG_ID, "CÂN BẰNG ÂM DƯƠNG", 0, "", { canbangAmduongMinutes: 0 }); } }
+        function ensureCanBangAmDuongTask() { const list = document.getElementById('list-q1'); if (!document.getElementById(CANBANG_AMDUONG_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = CANBANG_AMDUONG_ID; Object.assign(li.dataset, { id: CANBANG_AMDUONG_ID, seconds: "0", quad: "q1", title: "CÂN BẰNG ÂM DƯƠNG", fixedTime: "", isSetupTask: "true", saved: "true", canbangAmduongMinutes: "0" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#7c3aed">☯️ CÂN BẰNG ÂM DƯƠNG</span><span class="task-time-row"><span class="time-display canbang-amduong-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-wide"><input type="number" class="task-time-input" id="canbang-amduong-minutes" value="0" min="0" max="120" placeholder="m" onchange="updateCanBangAmDuongTime()"><span class="task-time-label">m</span><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${CANBANG_AMDUONG_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; const qt = document.getElementById(QUANAM_TASK_ID); if (qt && qt.nextSibling) list.insertBefore(li, qt.nextSibling); else list.appendChild(li); saveFixedTask(CANBANG_AMDUONG_ID, "CÂN BẰNG ÂM DƯƠNG", 0, "", { canbangAmduongMinutes: 0 }); } }
         function ensureCanBangDoshaTask() { const list = document.getElementById('list-q1'); if (!document.getElementById(CANBANG_DOSHA_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = CANBANG_DOSHA_ID; Object.assign(li.dataset, { id: CANBANG_DOSHA_ID, seconds: "0", quad: "q1", title: "CÂN BẰNG 3 DOSHA", fixedTime: "", isSetupTask: "true", saved: "true", canbangDoshaMinutes: "0" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#0d9488">🕉️ CÂN BẰNG 3 DOSHA</span><span class="task-time-row"><span class="time-display canbang-dosha-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-wide"><input type="number" class="task-time-input" id="canbang-dosha-minutes" value="0" min="0" max="120" placeholder="m" onchange="updateCanBangDoshaTime()"><span class="task-time-label">m</span><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${CANBANG_DOSHA_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; const ca = document.getElementById(CANBANG_AMDUONG_ID); if (ca && ca.nextSibling) list.insertBefore(li, ca.nextSibling); else list.appendChild(li); saveFixedTask(CANBANG_DOSHA_ID, "CÂN BẰNG 3 DOSHA", 0, "", { canbangDoshaMinutes: 0 }); } }
+        /* THÔNG KINH - nằm SAU Cân Bằng 3 Dosha */
+        function ensureThongKinhTask() { const list = document.getElementById('list-q1'); if (!document.getElementById(THONGKINH_TASK_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = THONGKINH_TASK_ID; Object.assign(li.dataset, { id: THONGKINH_TASK_ID, seconds: "0", quad: "q1", title: "THÔNG KINH", fixedTime: "", isSetupTask: "true", saved: "true", thongkinhMinutes: "0" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#e11d48">📿 THÔNG KINH</span><span class="task-time-row"><span class="time-display thongkinh-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-wide"><input type="number" class="task-time-input" id="thongkinh-minutes" value="0" min="0" max="120" placeholder="m" onchange="updateThongKinhTime()"><span class="task-time-label">m</span><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${THONGKINH_TASK_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; const cd = document.getElementById(CANBANG_DOSHA_ID); if (cd && cd.nextSibling) list.insertBefore(li, cd.nextSibling); else list.appendChild(li); saveFixedTask(THONGKINH_TASK_ID, "THÔNG KINH", 0, "", { thongkinhMinutes: 0 }); } }
 
-        function updateGiaoLyTime() { const m = parseInt(document.getElementById('giaoly-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(GIAOLY_TASK_ID); if (item) { item.dataset.seconds = ts; item.dataset.giaolyMinutes = m; const d = item.querySelector('.giaoly-display'); if (d) d.innerText = formatTime(ts); saveFixedTask(GIAOLY_TASK_ID, "GIÁO LÝ 30'", ts, item.dataset.fixedTime || "", { giaolyMinutes: m }); calculateTime(); } }
-        function updateQuanAmTime() { const h = parseInt(document.getElementById('quanam-hours').value) || 0; const m = parseInt(document.getElementById('quanam-minutes').value) || 0; const ts = Math.floor((h*3600 + m*60) * 2.5); const item = document.getElementById(QUANAM_TASK_ID); if (item) { item.dataset.seconds = ts; item.dataset.quanamHours = h; item.dataset.quanamMinutes = m; const d = item.querySelector('.quanam-display'); if (d) d.innerText = formatTime(ts); saveFixedTask(QUANAM_TASK_ID, "QUÁN ÂM 3H", ts, item.dataset.fixedTime || "", { quanamHours: h, quanamMinutes: m }); calculateTime(); } }
-        function updateThongKinhTime() { const m = parseInt(document.getElementById('thongkinh-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(THONGKINH_TASK_ID); if (item) { item.dataset.seconds = ts; item.dataset.thongkinhMinutes = m; const d = item.querySelector('.thongkinh-display'); if (d) d.innerText = formatTime(ts); saveFixedTask(THONGKINH_TASK_ID, "THÔNG KINH", ts, item.dataset.fixedTime || "", { thongkinhMinutes: m }); calculateTime(); } }
-        function updateCanBangAmDuongTime() { const m = parseInt(document.getElementById('canbang-amduong-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(CANBANG_AMDUONG_ID); if (item) { item.dataset.seconds = ts; item.dataset.canbangAmduongMinutes = m; const d = item.querySelector('.canbang-amduong-display'); if (d) d.innerText = formatTime(ts); saveFixedTask(CANBANG_AMDUONG_ID, "CÂN BẰNG ÂM DƯƠNG", ts, item.dataset.fixedTime || "", { canbangAmduongMinutes: m }); calculateTime(); } }
-        function updateCanBangDoshaTime() { const m = parseInt(document.getElementById('canbang-dosha-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(CANBANG_DOSHA_ID); if (item) { item.dataset.seconds = ts; item.dataset.canbangDoshaMinutes = m; const d = item.querySelector('.canbang-dosha-display'); if (d) d.innerText = formatTime(ts); saveFixedTask(CANBANG_DOSHA_ID, "CÂN BẰNG 3 DOSHA", ts, item.dataset.fixedTime || "", { canbangDoshaMinutes: m }); calculateTime(); } }
+        /* === 3 NHIỆM VỤ MẶC ĐỊNH CHO Q2 (Thói Quen Quan Trọng) === */
+        function ensureMassageTask() { const list = document.getElementById('list-q2'); if (!document.getElementById(MASSAGE_TASK_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = MASSAGE_TASK_ID; Object.assign(li.dataset, { id: MASSAGE_TASK_ID, seconds: "0", quad: "q2", title: "💼 Massage Trị Liệu", fixedTime: "", isSetupTask: "true", saved: "true", massageMinutes: "0" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#b45309">💼 Massage Trị Liệu</span><span class="task-time-row"><span class="time-display massage-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-wide"><input type="number" class="task-time-input" id="massage-minutes" value="0" min="0" max="300" placeholder="m" onchange="updateMassageTime()"><span class="task-time-label">m</span><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${MASSAGE_TASK_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; list.appendChild(li); saveFixedTask(MASSAGE_TASK_ID, "💼 Massage Trị Liệu", 0, "", { massageMinutes: 0 }); } }
+        function ensureLuyenHatTask() { const list = document.getElementById('list-q2'); if (!document.getElementById(LUYENHAT_TASK_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = LUYENHAT_TASK_ID; Object.assign(li.dataset, { id: LUYENHAT_TASK_ID, seconds: "0", quad: "q2", title: "🎵 Luyện Hát", fixedTime: "", isSetupTask: "true", saved: "true", luyenhatMinutes: "0" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#7c3aed">🎵 Luyện Hát</span><span class="task-time-row"><span class="time-display luyenhat-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-wide"><input type="number" class="task-time-input" id="luyenhat-minutes" value="0" min="0" max="300" placeholder="m" onchange="updateLuyenHatTime()"><span class="task-time-label">m</span><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${LUYENHAT_TASK_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; const mt = document.getElementById(MASSAGE_TASK_ID); if (mt && mt.nextSibling) list.insertBefore(li, mt.nextSibling); else list.appendChild(li); saveFixedTask(LUYENHAT_TASK_ID, "🎵 Luyện Hát", 0, "", { luyenhatMinutes: 0 }); } }
+        function ensureSangTacTask() { const list = document.getElementById('list-q2'); if (!document.getElementById(SANGTAC_TASK_ID)) { const li = document.createElement('li'); li.className = "task-item text-sm"; li.id = SANGTAC_TASK_ID; Object.assign(li.dataset, { id: SANGTAC_TASK_ID, seconds: "0", quad: "q2", title: "✍️ Sáng Tác Nhạc", fixedTime: "", isSetupTask: "true", saved: "true", sangtacMinutes: "0" }); li.innerHTML = `<span class="drag-handle" style="visibility:hidden">⋮⋮</span><span class="task-content"><span class="task-title-row" style="color:#059669">✍️ Sáng Tác Nhạc</span><span class="task-time-row"><span class="time-display sangtac-display">00:00:00</span><span class="fixed-time-label"></span></span></span><div class="task-actions task-actions-wide"><input type="number" class="task-time-input" id="sangtac-minutes" value="0" min="0" max="300" placeholder="m" onchange="updateSangTacTime()"><span class="task-time-label">m</span><span class="action-icon clock-icon text-slate-400" onclick="openTimePicker('${SANGTAC_TASK_ID}')">🕒</span><span class="action-icon star-icon text-amber-500">★</span><span class="action-icon" style="visibility:hidden">🗑️</span></div>`; const lh = document.getElementById(LUYENHAT_TASK_ID); if (lh && lh.nextSibling) list.insertBefore(li, lh.nextSibling); else list.appendChild(li); saveFixedTask(SANGTAC_TASK_ID, "✍️ Sáng Tác Nhạc", 0, "", { sangtacMinutes: 0 }); } }
 
-        async function saveFixedTask(id, title, seconds, fixedTime, extraData = {}) { const task = { id, title, seconds, quad: "q1", fixedTime: fixedTime || "", isSetupTask: true, saved: true, createdAt: getTodayDateString(), ...extraData }; if (currentUser && db) { try { await db.doc(`artifacts/${appId}/users/${currentUser.uid}/tasks/${id}`).set(task); } catch(e) {} } else { const idx = inMemoryTasks.findIndex(t => t.id === id); if (idx === -1) inMemoryTasks.push(task); else inMemoryTasks[idx] = task; } }
+        function updateMassageTime() { const m = parseInt(document.getElementById('massage-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(MASSAGE_TASK_ID); if (item) { item.dataset.seconds = ts; item.dataset.massageMinutes = m; const d = item.querySelector('.massage-display'); if (d) d.textContent = formatTime(ts); saveFixedTask(MASSAGE_TASK_ID, "💼 Massage Trị Liệu", ts, item.dataset.fixedTime || "", { massageMinutes: m }); calculateTime(); } }
+        function updateLuyenHatTime() { const m = parseInt(document.getElementById('luyenhat-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(LUYENHAT_TASK_ID); if (item) { item.dataset.seconds = ts; item.dataset.luyenhatMinutes = m; const d = item.querySelector('.luyenhat-display'); if (d) d.textContent = formatTime(ts); saveFixedTask(LUYENHAT_TASK_ID, "🎵 Luyện Hát", ts, item.dataset.fixedTime || "", { luyenhatMinutes: m }); calculateTime(); } }
+        function updateSangTacTime() { const m = parseInt(document.getElementById('sangtac-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(SANGTAC_TASK_ID); if (item) { item.dataset.seconds = ts; item.dataset.sangtacMinutes = m; const d = item.querySelector('.sangtac-display'); if (d) d.textContent = formatTime(ts); saveFixedTask(SANGTAC_TASK_ID, "✍️ Sáng Tác Nhạc", ts, item.dataset.fixedTime || "", { sangtacMinutes: m }); calculateTime(); } }
+
+        function updateGiaoLyTime() { const m = parseInt(document.getElementById('giaoly-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(GIAOLY_TASK_ID); if (item) { item.dataset.seconds = ts; item.dataset.giaolyMinutes = m; const d = item.querySelector('.giaoly-display'); if (d) d.textContent = formatTime(ts); saveFixedTask(GIAOLY_TASK_ID, "GIÁO LÝ 30'", ts, item.dataset.fixedTime || "", { giaolyMinutes: m }); calculateTime(); } }
+        function updateQuanAmTime() { const h = parseInt(document.getElementById('quanam-hours').value) || 0; const m = parseInt(document.getElementById('quanam-minutes').value) || 0; const ts = Math.floor((h*3600 + m*60) * 2.5); const item = document.getElementById(QUANAM_TASK_ID); if (item) { item.dataset.seconds = ts; item.dataset.quanamHours = h; item.dataset.quanamMinutes = m; const d = item.querySelector('.quanam-display'); if (d) d.textContent = formatTime(ts); saveFixedTask(QUANAM_TASK_ID, "QUÁN ÂM 3H", ts, item.dataset.fixedTime || "", { quanamHours: h, quanamMinutes: m }); calculateTime(); } }
+        function updateThongKinhTime() { const m = parseInt(document.getElementById('thongkinh-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(THONGKINH_TASK_ID); if (item) { item.dataset.seconds = ts; item.dataset.thongkinhMinutes = m; const d = item.querySelector('.thongkinh-display'); if (d) d.textContent = formatTime(ts); saveFixedTask(THONGKINH_TASK_ID, "THÔNG KINH", ts, item.dataset.fixedTime || "", { thongkinhMinutes: m }); calculateTime(); } }
+        function updateCanBangAmDuongTime() { const m = parseInt(document.getElementById('canbang-amduong-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(CANBANG_AMDUONG_ID); if (item) { item.dataset.seconds = ts; item.dataset.canbangAmduongMinutes = m; const d = item.querySelector('.canbang-amduong-display'); if (d) d.textContent = formatTime(ts); saveFixedTask(CANBANG_AMDUONG_ID, "CÂN BẰNG ÂM DƯƠNG", ts, item.dataset.fixedTime || "", { canbangAmduongMinutes: m }); calculateTime(); } }
+        function updateCanBangDoshaTime() { const m = parseInt(document.getElementById('canbang-dosha-minutes').value) || 0; const ts = m * 60; const item = document.getElementById(CANBANG_DOSHA_ID); if (item) { item.dataset.seconds = ts; item.dataset.canbangDoshaMinutes = m; const d = item.querySelector('.canbang-dosha-display'); if (d) d.textContent = formatTime(ts); saveFixedTask(CANBANG_DOSHA_ID, "CÂN BẰNG 3 DOSHA", ts, item.dataset.fixedTime || "", { canbangDoshaMinutes: m }); calculateTime(); } }
+
+        async function saveFixedTask(id, title, seconds, fixedTime, extraData = {}) { const quad = [MASSAGE_TASK_ID, LUYENHAT_TASK_ID, SANGTAC_TASK_ID].includes(id) ? "q2" : "q1"; const task = { id, title, seconds, quad, fixedTime: fixedTime || "", isSetupTask: true, saved: true, createdAt: getTodayDateString(), ...extraData }; if (currentUser && db) { try { await db.doc(`artifacts/${appId}/users/${currentUser.uid}/tasks/${id}`).set(task); } catch(e) {} } else { const idx = inMemoryTasks.findIndex(t => t.id === id); if (idx === -1) inMemoryTasks.push(task); else inMemoryTasks[idx] = task; } }
 
         function showToast(msg, icon = "ℹ️") { const toast = document.getElementById('custom-toast'); document.getElementById('toast-message').innerText = msg; document.getElementById('toast-icon').innerText = icon; toast.classList.remove('hidden'); setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 50); setTimeout(() => { toast.classList.add('translate-y-4', 'opacity-0'); setTimeout(() => toast.classList.add('hidden'), 300); }, 3000); }
         
@@ -416,14 +472,14 @@
         function playCustomRingtone() { if (audioPlayer.src) { audioPlayer.currentTime = 0; audioPlayer.play().catch(()=>{}); } }
         function stopCustomRingtone() { if (audioPlayer.src) { audioPlayer.pause(); audioPlayer.currentTime = 0; } }
 
-        function markTaskCompletedWithCheck(taskId, hasTimer) { const item = document.querySelector(`[data-id="${taskId}"]`); if (!item) return; item.classList.remove('running'); item.classList.add('completed'); if (hasTimer) getOrCreateCheckbox(item); const t = item.querySelector('.countdown-timer'); if (t) t.style.display = 'none'; markTaskCompleted(item.dataset.quad); taskEndTime = null; }
+        function markTaskCompletedWithCheck(taskId, hasTimer) { const item = document.querySelector(`[data-id="${taskId}"]`); if (!item) return; item.classList.remove('running'); item.classList.add('completed'); if (hasTimer) getOrCreateCheckbox(item); markTaskCompleted(item.dataset.quad); taskEndTime = null; }
         function markTaskCompleted(quad) { if (quad === 'q1') completedTasks.q1++; else if (quad === 'q2') completedTasks.q2++; updateAllProgressDisplays(); }
         function countTasksByQuad() { totalTasks.q1 = 0; totalTasks.q2 = 0; document.querySelectorAll('#list-q1 .task-item').forEach(i => { if (i.dataset.id !== SETUP_TASK_ID && !i.classList.contains('completed')) totalTasks.q1++; }); document.querySelectorAll('#list-q2 .task-item').forEach(i => { if (!i.classList.contains('completed')) totalTasks.q2++; }); updateAllProgressDisplays(); }
 
-        async function loadSavedTasksFirestore() { if (!currentUser || !db) return; try { const snap = await db.collection(`artifacts/${appId}/users/${currentUser.uid}/tasks`).get(); document.getElementById('list-q1').innerHTML = ''; document.getElementById('list-q2').innerHTML = ''; const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID]; ensureSetupTask();ensureGiaoLyTask();ensureQuanAmTask();ensureThongKinhTask();ensureCanBangAmDuongTask();ensureCanBangDoshaTask(); snap.forEach(doc => { if (fIds.includes(doc.id)) return; const t = doc.data(); createTaskElement(t.title, t.seconds, t.quad, t.saved, doc.id, t.fixedTime||"", t.saved); }); sortTasksByOrder('q1');sortTasksByOrder('q2');initDragAndDrop('list-q1');initDragAndDrop('list-q2');calculateTime(); } catch(e) { loadSavedTasksMemory(); } }
-        function loadSavedTasksMemory() { document.getElementById('list-q1').innerHTML = ''; document.getElementById('list-q2').innerHTML = ''; const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID]; ensureSetupTask();ensureGiaoLyTask();ensureQuanAmTask();ensureThongKinhTask();ensureCanBangAmDuongTask();ensureCanBangDoshaTask(); inMemoryTasks.forEach(t => { if (!fIds.includes(t.id)) createTaskElement(t.title, t.seconds, t.quad, t.saved, t.id, t.fixedTime||"", t.saved); }); sortTasksByOrder('q1');sortTasksByOrder('q2');initDragAndDrop('list-q1');initDragAndDrop('list-q2');calculateTime(); }
-        async function saveTaskToStorage(task) { const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID]; if (fIds.includes(task.id)) return; const ts = { ...task, saved: task.saved||false, createdAt: task.createdAt||getTodayDateString() }; if (currentUser&&db) { try { await db.doc(`artifacts/${appId}/users/${currentUser.uid}/tasks/${task.id}`).set(ts); } catch(e) {} } else { const idx = inMemoryTasks.findIndex(t=>t.id===task.id); if (idx!==-1) inMemoryTasks[idx]=ts; else inMemoryTasks.push(ts); } }
-        async function removeTaskFromStorage(id) { const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID]; if (fIds.includes(id)) return; if (currentUser&&db) { try { await db.doc(`artifacts/${appId}/users/${currentUser.uid}/tasks/${id}`).delete(); } catch(e) {} } else { inMemoryTasks = inMemoryTasks.filter(t=>t.id!==id); } }
+        async function loadSavedTasksFirestore() { if (!currentUser || !db) return; try { const snap = await db.collection(`artifacts/${appId}/users/${currentUser.uid}/tasks`).get(); document.getElementById('list-q1').innerHTML = ''; document.getElementById('list-q2').innerHTML = ''; const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID,MASSAGE_TASK_ID,LUYENHAT_TASK_ID,SANGTAC_TASK_ID]; ensureSetupTask();ensureGiaoLyTask();ensureQuanAmTask();ensureCanBangAmDuongTask();ensureCanBangDoshaTask();ensureThongKinhTask();ensureMassageTask();ensureLuyenHatTask();ensureSangTacTask(); snap.forEach(doc => { if (fIds.includes(doc.id)) return; const t = doc.data(); createTaskElement(t.title, t.seconds, t.quad, t.saved, doc.id, t.fixedTime||"", t.saved); }); sortTasksByOrder('q1');sortTasksByOrder('q2');initDragAndDrop('list-q1');initDragAndDrop('list-q2');calculateTime(); } catch(e) { loadSavedTasksMemory(); } }
+        function loadSavedTasksMemory() { document.getElementById('list-q1').innerHTML = ''; document.getElementById('list-q2').innerHTML = ''; const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID,MASSAGE_TASK_ID,LUYENHAT_TASK_ID,SANGTAC_TASK_ID]; ensureSetupTask();ensureGiaoLyTask();ensureQuanAmTask();ensureCanBangAmDuongTask();ensureCanBangDoshaTask();ensureThongKinhTask();ensureMassageTask();ensureLuyenHatTask();ensureSangTacTask(); inMemoryTasks.forEach(t => { if (!fIds.includes(t.id)) createTaskElement(t.title, t.seconds, t.quad, t.saved, t.id, t.fixedTime||"", t.saved); }); sortTasksByOrder('q1');sortTasksByOrder('q2');initDragAndDrop('list-q1');initDragAndDrop('list-q2');calculateTime(); }
+        async function saveTaskToStorage(task) { const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID,MASSAGE_TASK_ID,LUYENHAT_TASK_ID,SANGTAC_TASK_ID]; if (fIds.includes(task.id)) return; const ts = { ...task, saved: task.saved||false, createdAt: task.createdAt||getTodayDateString() }; if (currentUser&&db) { try { await db.doc(`artifacts/${appId}/users/${currentUser.uid}/tasks/${task.id}`).set(ts); } catch(e) {} } else { const idx = inMemoryTasks.findIndex(t=>t.id===task.id); if (idx!==-1) inMemoryTasks[idx]=ts; else inMemoryTasks.push(ts); } }
+        async function removeTaskFromStorage(id) { const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID,MASSAGE_TASK_ID,LUYENHAT_TASK_ID,SANGTAC_TASK_ID]; if (fIds.includes(id)) return; if (currentUser&&db) { try { await db.doc(`artifacts/${appId}/users/${currentUser.uid}/tasks/${id}`).delete(); } catch(e) {} } else { inMemoryTasks = inMemoryTasks.filter(t=>t.id!==id); } }
 
         function calculateTime() { const now = new Date(); const sh = parseInt(document.getElementById('start-hour').value)||0; const sm = parseInt(document.getElementById('start-minute').value)||0; const startSec = sh*3600+sm*60; const curSec = now.getHours()*3600+now.getMinutes()*60+now.getSeconds(); let rem = startSec - curSec; if (rem<0) rem+=86400; let since = curSec - startSec; if (since<0) since+=86400; let used=0; const rm=(parseInt(document.getElementById('rest-minutes').value)||0)*60; const am=(parseInt(document.getElementById('alarm-minutes').value)||0)*60; document.querySelectorAll('.task-item:not(.completed)').forEach(i=>{used+=parseInt(i.dataset.seconds)+rm+am;}); document.getElementById('time-remaining').innerText = formatTime(Math.max(0,86400-since-used)); if(isFlowRunning) checkFixedTimeTriggers(); if(now.getMinutes()!==lastCheckedMinute){lastCheckedMinute=now.getMinutes();cleanupOldTasks();} }
         let lastCheckedMinute = -1;
@@ -435,21 +491,29 @@
         function updateTaskFixedTime(id, ft) { const item = document.querySelector(`[data-id="${id}"]`); if (item) { item.dataset.fixedTime = ft; const lbl = item.querySelector('.fixed-time-label'); if (lbl) lbl.innerHTML = ft ? `⏰ ${ft}` : ""; const clk = item.querySelector('.clock-icon'); if (clk) clk.className = `action-icon clock-icon ${ft?'text-indigo-600 font-bold':'text-slate-400'}`; if (item.dataset.saved==="true"||item.dataset.isSetupTask==="true") { saveTaskToStorage({ id, title: item.dataset.title, seconds: parseInt(item.dataset.seconds), quad: item.dataset.quad, fixedTime: ft, isSetupTask: item.dataset.isSetupTask==="true", saved: item.dataset.saved==="true", createdAt: item.dataset.createdAt||getTodayDateString() }); } calculateTime(); } }
         function checkFixedTimeTriggers() { if (!isFlowRunning) return; const now = new Date(); const chhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`; if (chhmm === lastTriggeredFixedMinute) return; let matched = null; document.querySelectorAll('.task-item:not(.completed):not(.running)').forEach(item => { if (item.dataset.fixedTime === chhmm) { matched = { id: item.dataset.id, title: item.dataset.title, seconds: parseInt(item.dataset.seconds), quad: item.dataset.quad, fixedTime: item.dataset.fixedTime, isSetupTask: item.dataset.isSetupTask === "true" }; } }); if (matched) { lastTriggeredFixedMinute = chhmm; if (matched.isSetupTask && matched.id === SETUP_TASK_ID) { triggerSetupTask(matched); } else { triggerFixedTask(matched); } } }
         function triggerSetupTask(task) { stopCustomRingtone(); showToast(`⏰ Đến giờ: ${task.fixedTime}! Bắt đầu Flow.`, "📋"); startFullFlowImmediately(); }
-        function triggerFixedTask(task) { stopCustomRingtone(); showToast(`⏰ Đúng giờ: ${task.fixedTime}! Bắt đầu: ${task.title}`, "🔔"); document.querySelectorAll('.task-item.running,.task-item.completed').forEach(i=>{i.classList.remove('running','completed');const t=i.querySelector('.countdown-timer');if(t)t.style.display='none';const c=i.querySelector('.complete-checkbox');if(c)c.remove();}); clearInterval(timerInterval); currentTask=task;currentPhase="task";isFlowRunning=true;updatePhaseOverlay(null); const item=document.querySelector(`[data-id="${task.id}"]`); const es=task.seconds>0?task.seconds:5; if(item){item.classList.add('running');currentRunningTaskId=task.id;if(task.seconds>0){taskEndTime=Date.now()+es*1000;const t=getOrCreateCountdownTimer(item);t.style.display='inline-block';t.innerText=formatTime(es);}else{taskEndTime=null;}} document.getElementById('skip-task-btn').classList.remove('hidden');scrollToRunningTask(task.id);playChime();startTimer(es,"task"); }
+        function triggerFixedTask(task) { stopCustomRingtone(); showToast(`⏰ Đúng giờ: ${task.fixedTime}! Bắt đầu: ${task.title}`, "🔔"); document.querySelectorAll('.task-item.running,.task-item.completed').forEach(i=>{i.classList.remove('running','completed');const c=i.querySelector('.complete-checkbox');if(c)c.remove();}); clearInterval(timerInterval); currentTask=task;currentPhase="task";isFlowRunning=true;updatePhaseOverlay(null);lockFlowUI(); const item=document.querySelector(`[data-id="${task.id}"]`); const es=task.seconds>0?task.seconds:5; if(item){item.classList.add('running');currentRunningTaskId=task.id;if(task.seconds>0){taskEndTime=Date.now()+es*1000;updateTimeDisplay(item, formatTime(es));}else{taskEndTime=null;}} scrollToRunningTask(task.id);playChime();startTimer(es,"task"); }
 
         function addTask(quad) { const input = document.getElementById('task-' + quad); if (!input.value.trim()) return; const h = parseInt(document.getElementById('h-' + quad).value) || 0; const m = parseInt(document.getElementById('m-' + quad).value) || 0; const s = parseInt(document.getElementById('s-' + quad).value) || 0; const totalSeconds = h * 3600 + m * 60 + s; const id = Date.now().toString() + Math.random().toString(36).substr(2, 5); let title = input.value.trim(); title = title.charAt(0).toUpperCase() + title.slice(1); createTaskElement(title, totalSeconds, quad, false, id, ""); saveTaskToStorage({ id, title, seconds: totalSeconds, quad, fixedTime: "", saved: false, createdAt: getTodayDateString() }); input.value = ''; document.getElementById('h-' + quad).value = ''; document.getElementById('m-' + quad).value = ''; document.getElementById('s-' + quad).value = ''; initDragAndDrop('list-' + quad); saveTaskOrder(quad); calculateTime(); }
         function createTaskElement(title, seconds, quad, isSaved, id, fixedTime, saved) { const li = document.createElement('li'); li.className = "task-item text-xs"; Object.assign(li.dataset, { id, seconds, quad, title, fixedTime: fixedTime || "", saved: (saved === true || isSaved) ? "true" : "false" }); li.draggable = true; const timeLabelHTML = fixedTime ? `<span class="fixed-time-label">⏰ ${fixedTime}</span>` : `<span class="fixed-time-label"></span>`; const clockColorClass = fixedTime ? 'text-indigo-600 font-bold' : 'text-slate-400'; const timeDisplay = seconds > 0 ? formatTime(seconds) : '00:00:00'; li.innerHTML = `<span class="drag-handle">⋮⋮</span><span class="task-content"><span class="task-title-row">${title}</span><span class="task-time-row"><span class="time-display">${timeDisplay}</span>${timeLabelHTML}</span></span><div class="task-actions task-actions-normal"><span class="action-icon clock-icon ${clockColorClass}" onclick="openTimePicker('${id}')">🕒</span><span class="action-icon star-icon text-amber-500" onclick="toggleSave(this,'${id}','${title}',${seconds},'${quad}')">${isSaved ? '★' : '☆'}</span><span class="action-icon text-red-400" onclick="deleteTask(this,'${id}')">🗑️</span></div>`; document.getElementById('list-' + quad).appendChild(li); }
-        function toggleSave(el, id, title, seconds, quad) { const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID]; if (fIds.includes(id)) { showToast("Nhiệm vụ này luôn được lưu!", "ℹ️"); return; } const item = document.querySelector(`[data-id="${id}"]`); const ft = item ? (item.dataset.fixedTime || "") : ""; if (el.innerText === '☆') { el.innerText = '★'; item.dataset.saved = "true"; saveTaskToStorage({ id, title, seconds, quad, fixedTime: ft, saved: true, createdAt: item.dataset.createdAt || getTodayDateString() }); showToast("Đã lưu!", "⭐"); } else { el.innerText = '☆'; item.dataset.saved = "false"; saveTaskToStorage({ id, title, seconds, quad, fixedTime: ft, saved: false, createdAt: getTodayDateString() }); showToast("Đã bỏ lưu!", "ℹ️"); } }
-        function deleteTask(el, id) { const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID]; if (fIds.includes(id)) { showToast("Không thể xóa!", "⚠️"); return; } const item = el.closest('.task-item'); if (item.classList.contains('running') || item.classList.contains('completed')) { showToast("Không thể xóa nhiệm vụ đang chạy/hoàn thành!", "⚠️"); return; } const quad = item.dataset.quad; item.remove(); removeTaskFromStorage(id); saveTaskOrder(quad); calculateTime(); }
+        function toggleSave(el, id, title, seconds, quad) { const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID,MASSAGE_TASK_ID,LUYENHAT_TASK_ID,SANGTAC_TASK_ID]; if (fIds.includes(id)) { showToast("Nhiệm vụ này luôn được lưu!", "ℹ️"); return; } const item = document.querySelector(`[data-id="${id}"]`); const ft = item ? (item.dataset.fixedTime || "") : ""; if (el.innerText === '☆') { el.innerText = '★'; item.dataset.saved = "true"; saveTaskToStorage({ id, title, seconds, quad, fixedTime: ft, saved: true, createdAt: item.dataset.createdAt || getTodayDateString() }); showToast("Đã lưu!", "⭐"); } else { el.innerText = '☆'; item.dataset.saved = "false"; saveTaskToStorage({ id, title, seconds, quad, fixedTime: ft, saved: false, createdAt: getTodayDateString() }); showToast("Đã bỏ lưu!", "ℹ️"); } }
+        function deleteTask(el, id) { const fIds = [SETUP_TASK_ID,GIAOLY_TASK_ID,QUANAM_TASK_ID,THONGKINH_TASK_ID,CANBANG_AMDUONG_ID,CANBANG_DOSHA_ID,MASSAGE_TASK_ID,LUYENHAT_TASK_ID,SANGTAC_TASK_ID]; if (fIds.includes(id)) { showToast("Không thể xóa!", "⚠️"); return; } const item = el.closest('.task-item'); if (item.classList.contains('running') || item.classList.contains('completed')) { showToast("Không thể xóa nhiệm vụ đang chạy/hoàn thành!", "⚠️"); return; } const quad = item.dataset.quad; item.remove(); removeTaskFromStorage(id); saveTaskOrder(quad); calculateTime(); }
+
+        /* === FLOW LOCK: Khi bấm Bắt Đầu, không thể thoát === */
+        function lockFlowUI() {
+            document.body.classList.add('flow-locked');
+        }
+        function unlockFlowUI() {
+            document.body.classList.remove('flow-locked');
+        }
 
         function startFullFlow() { startFullFlowImmediately(); }
-        function startFullFlowImmediately() { clearFlowState(); document.querySelectorAll('.task-item.running,.task-item.completed').forEach(i=>{i.classList.remove('running','completed');const t=i.querySelector('.countdown-timer');if(t)t.style.display='none';const c=i.querySelector('.complete-checkbox');if(c)c.remove();}); currentRunningTaskId=null;completedTasks={q1:0,q2:0};isFlowRunning=true;updatePhaseOverlay(null);taskEndTime=null;phaseEndTime=null;countTasksByQuad();flowQueue=[]; document.querySelectorAll('#list-q1 .task-item').forEach(i=>{if(i.dataset.id===SETUP_TASK_ID)return;const s=parseInt(i.dataset.seconds);const ft=i.dataset.fixedTime||"";if(!ft&&!i.classList.contains('completed'))flowQueue.push({title:i.dataset.title,seconds:s,quad:'q1',fixedTime:"",id:i.dataset.id,element:i});}); document.querySelectorAll('#list-q2 .task-item').forEach(i=>{const s=parseInt(i.dataset.seconds);const ft=i.dataset.fixedTime||"";if(!ft&&!i.classList.contains('completed'))flowQueue.push({title:i.dataset.title,seconds:s,quad:'q2',fixedTime:"",id:i.dataset.id,element:i});}); updateAllProgressDisplays(); if(flowQueue.length>0){showToast(`Bắt đầu Flow: ${flowQueue.length} nhiệm vụ!`,"🚀");runNextTask();}else{showToast("Không còn nhiệm vụ nào!","⏰");isFlowRunning=false;} }
-        function runNextTask() { flowQueue = flowQueue.filter(t=>{const i=document.querySelector(`[data-id="${t.id}"]`);return i&&!i.classList.contains('completed');}); if(flowQueue.length===0){completeFlow();return;} stopCustomRingtone(); if(currentTask&&currentTask.quad&&currentPhase==="task"){const pi=document.querySelector(`[data-id="${currentTask.id}"]`);if(pi&&!pi.classList.contains('completed')){markTaskCompletedWithCheck(currentTask.id,parseInt(pi.dataset.seconds)>0);}} while(flowQueue.length>0&&flowQueue[0].seconds<=0){const zt=flowQueue.shift();const zi=document.querySelector(`[data-id="${zt.id}"]`);if(zi&&!zi.classList.contains('completed')){zi.classList.add('completed');const t=zi.querySelector('.countdown-timer');if(t)t.style.display='none';markTaskCompleted(zt.quad);}} if(flowQueue.length===0){completeFlow();return;} currentTask=flowQueue.shift();currentPhase="task";isFlowRunning=true;updatePhaseOverlay(null); const item=document.querySelector(`[data-id="${currentTask.id}"]`);const es=currentTask.seconds; if(item){item.classList.add('running');currentRunningTaskId=currentTask.id;if(currentTask.seconds>0){taskEndTime=Date.now()+es*1000;const t=getOrCreateCountdownTimer(item);t.style.display='inline-block';t.innerText=formatTime(es);}else{taskEndTime=null;}} document.getElementById('skip-task-btn').classList.remove('hidden');scrollToRunningTask(currentTask.id);playChime();startTimer(es,"task"); }
-        function skipTask() { stopCustomRingtone(); if(currentTask&&currentTask.quad&&currentPhase==="task"){const item=document.querySelector(`[data-id="${currentTask.id}"]`);if(item&&!item.classList.contains('completed')){markTaskCompletedWithCheck(currentTask.id,parseInt(item.dataset.seconds)>0);}} document.getElementById('skip-task-btn').classList.add('hidden');updatePhaseOverlay(null);taskEndTime=null;if(flowQueue.length===0){completeFlow();return;}runNextTask(); }
-        function runAlarmPeriod() { if(currentTask&&currentTask.quad&&currentPhase==="task"){const item=document.querySelector(`[data-id="${currentTask.id}"]`);if(item&&!item.classList.contains('completed')){markTaskCompletedWithCheck(currentTask.id,parseInt(item.dataset.seconds)>0);}} document.getElementById('skip-task-btn').classList.add('hidden');currentPhase="alarm";taskEndTime=null;const as=(parseInt(document.getElementById('alarm-minutes').value)||0)*60;const aet=Date.now()+as*1000;updatePhaseOverlay('alarm',aet);playChime();if(audioPlayer.src){setTimeout(()=>{if(currentPhase==="alarm")playCustomRingtone();},1800);}startTimer(as,"alarm"); }
+        function startFullFlowImmediately() { clearFlowState(); document.querySelectorAll('.task-item.running,.task-item.completed').forEach(i=>{i.classList.remove('running','completed');const c=i.querySelector('.complete-checkbox');if(c)c.remove();}); currentRunningTaskId=null;completedTasks={q1:0,q2:0};isFlowRunning=true;updatePhaseOverlay(null);taskEndTime=null;phaseEndTime=null;countTasksByQuad();flowQueue=[]; document.querySelectorAll('#list-q1 .task-item').forEach(i=>{if(i.dataset.id===SETUP_TASK_ID)return;const s=parseInt(i.dataset.seconds);const ft=i.dataset.fixedTime||"";if(!ft&&!i.classList.contains('completed'))flowQueue.push({title:i.dataset.title,seconds:s,quad:'q1',fixedTime:"",id:i.dataset.id,element:i});}); document.querySelectorAll('#list-q2 .task-item').forEach(i=>{const s=parseInt(i.dataset.seconds);const ft=i.dataset.fixedTime||"";if(!ft&&!i.classList.contains('completed'))flowQueue.push({title:i.dataset.title,seconds:s,quad:'q2',fixedTime:"",id:i.dataset.id,element:i});}); updateAllProgressDisplays(); if(flowQueue.length>0){showToast(`Bắt đầu Flow: ${flowQueue.length} nhiệm vụ!`,"🚀");lockFlowUI();runNextTask();}else{showToast("Không còn nhiệm vụ nào!","⏰");isFlowRunning=false;} }
+        function runNextTask() { flowQueue = flowQueue.filter(t=>{const i=document.querySelector(`[data-id="${t.id}"]`);return i&&!i.classList.contains('completed');}); if(flowQueue.length===0){completeFlow();return;} stopCustomRingtone(); if(currentTask&&currentTask.quad&&currentPhase==="task"){const pi=document.querySelector(`[data-id="${currentTask.id}"]`);if(pi&&!pi.classList.contains('completed')){markTaskCompletedWithCheck(currentTask.id,parseInt(pi.dataset.seconds)>0);}} while(flowQueue.length>0&&flowQueue[0].seconds<=0){const zt=flowQueue.shift();const zi=document.querySelector(`[data-id="${zt.id}"]`);if(zi&&!zi.classList.contains('completed')){zi.classList.add('completed');markTaskCompleted(zt.quad);}} if(flowQueue.length===0){completeFlow();return;} currentTask=flowQueue.shift();currentPhase="task";isFlowRunning=true;updatePhaseOverlay(null); const item=document.querySelector(`[data-id="${currentTask.id}"]`);const es=currentTask.seconds; if(item){item.classList.add('running');currentRunningTaskId=currentTask.id;if(currentTask.seconds>0){taskEndTime=Date.now()+es*1000;updateTimeDisplay(item, formatTime(es));}else{taskEndTime=null;}} scrollToRunningTask(currentTask.id);playChime();startTimer(es,"task"); }
+        function skipTask() { stopCustomRingtone(); if(currentTask&&currentTask.quad&&currentPhase==="task"){const item=document.querySelector(`[data-id="${currentTask.id}"]`);if(item&&!item.classList.contains('completed')){markTaskCompletedWithCheck(currentTask.id,parseInt(item.dataset.seconds)>0);}} updatePhaseOverlay(null);taskEndTime=null;if(flowQueue.length===0){completeFlow();return;}runNextTask(); }
+        function runAlarmPeriod() { if(currentTask&&currentTask.quad&&currentPhase==="task"){const item=document.querySelector(`[data-id="${currentTask.id}"]`);if(item&&!item.classList.contains('completed')){markTaskCompletedWithCheck(currentTask.id,parseInt(item.dataset.seconds)>0);}} currentPhase="alarm";taskEndTime=null;const as=(parseInt(document.getElementById('alarm-minutes').value)||0)*60;const aet=Date.now()+as*1000;updatePhaseOverlay('alarm',aet);playChime();if(audioPlayer.src){setTimeout(()=>{if(currentPhase==="alarm")playCustomRingtone();},1800);}startTimer(as,"alarm"); }
         function runRestPeriod() { stopCustomRingtone();currentPhase="rest";taskEndTime=null;const rs=(parseInt(document.getElementById('rest-minutes').value)||0)*60;const ret=Date.now()+rs*1000;updatePhaseOverlay('rest',ret);playChime();startTimer(rs,"rest"); }
-        function startTimer(total, mode) { currentTimerTimeLeft=total;clearInterval(timerInterval);saveFlowState(true); timerInterval=setInterval(()=>{let remaining;if(mode==="task"&&currentTask&&currentTask.seconds>0&&taskEndTime)remaining=getRemainingSeconds(taskEndTime);else if(mode==="alarm"&&phaseEndTime)remaining=getRemainingSeconds(phaseEndTime);else if(mode==="rest"&&phaseEndTime)remaining=getRemainingSeconds(phaseEndTime);else{currentTimerTimeLeft--;remaining=Math.max(0,currentTimerTimeLeft);} if(mode==="task"&&currentTask&&currentTask.seconds>0){const item=document.querySelector(`[data-id="${currentTask.id}"]`);if(item){const t=getOrCreateCountdownTimer(item);t.innerText=formatTime(remaining);}} else if(mode==="alarm"){updatePhaseOverlay('alarm',phaseEndTime);const t=document.getElementById('phase-overlay-timer');if(t)t.textContent=formatTimeShort(remaining);} else if(mode==="rest"){updatePhaseOverlay('rest',phaseEndTime);const t=document.getElementById('phase-overlay-timer');if(t)t.textContent=formatTimeShort(remaining);} if(remaining<=0){clearInterval(timerInterval);if(mode==="task")runAlarmPeriod();else if(mode==="alarm")runRestPeriod();else runNextTask();}},200); }
-        function completeFlow() { if(currentTask&&currentTask.quad&&currentPhase==="task"){const item=document.querySelector(`[data-id="${currentTask.id}"]`);if(item&&!item.classList.contains('completed')){markTaskCompletedWithCheck(currentTask.id,parseInt(item.dataset.seconds)>0);}} clearInterval(timerInterval);stopCustomRingtone();flowQueue=[];currentTask=null;currentPhase=null;currentTimerTimeLeft=0;currentRunningTaskId=null;isFlowRunning=false;taskEndTime=null;phaseEndTime=null;document.getElementById('skip-task-btn').classList.add('hidden');updatePhaseOverlay(null);saveFlowState(false);showToast("Hoàn thành tất cả mục tiêu!","🎉"); }
+        function startTimer(total, mode) { currentTimerTimeLeft=total;clearInterval(timerInterval);saveFlowState(true); timerInterval=setInterval(()=>{let remaining;if(mode==="task"&&currentTask&&currentTask.seconds>0&&taskEndTime)remaining=getRemainingSeconds(taskEndTime);else if(mode==="alarm"&&phaseEndTime)remaining=getRemainingSeconds(phaseEndTime);else if(mode==="rest"&&phaseEndTime)remaining=getRemainingSeconds(phaseEndTime);else{currentTimerTimeLeft--;remaining=Math.max(0,currentTimerTimeLeft);} if(mode==="task"&&currentTask&&currentTask.seconds>0){const item=document.querySelector(`[data-id="${currentTask.id}"]`);if(item){updateTimeDisplay(item, formatTime(remaining));}} else if(mode==="alarm"){updatePhaseOverlay('alarm',phaseEndTime);const t=document.getElementById('phase-overlay-timer');if(t)t.textContent=formatTimeShort(remaining);} else if(mode==="rest"){updatePhaseOverlay('rest',phaseEndTime);const t=document.getElementById('phase-overlay-timer');if(t)t.textContent=formatTimeShort(remaining);} if(remaining<=0){clearInterval(timerInterval);if(mode==="task")runAlarmPeriod();else if(mode==="alarm")runRestPeriod();else runNextTask();}},200); }
+        function completeFlow() { if(currentTask&&currentTask.quad&&currentPhase==="task"){const item=document.querySelector(`[data-id="${currentTask.id}"]`);if(item&&!item.classList.contains('completed')){markTaskCompletedWithCheck(currentTask.id,parseInt(item.dataset.seconds)>0);}} clearInterval(timerInterval);stopCustomRingtone();flowQueue=[];currentTask=null;currentPhase=null;currentTimerTimeLeft=0;currentRunningTaskId=null;isFlowRunning=false;taskEndTime=null;phaseEndTime=null;updatePhaseOverlay(null);saveFlowState(false);unlockFlowUI();showToast("Hoàn thành tất cả mục tiêu!","🎉"); }
         function clearFlowState() { sessionStorage.removeItem('flowState'); if(currentUser&&db){try{db.doc(`artifacts/${appId}/users/${currentUser.uid}/flow/state`).set({isActive:false});}catch(e){}} }
         async function saveFlowState(isActive) { const am=(parseInt(document.getElementById('alarm-minutes').value)||0);const rm=(parseInt(document.getElementById('rest-minutes').value)||0);const sd={isActive,flowQueue,currentPhase,currentTask,taskEndTime:taskEndTime||0,phaseEndTime:phaseEndTime||0,alarmMinutes:am,restMinutes:rm,completedTasks,totalTasks}; if(currentUser&&db){try{await db.doc(`artifacts/${appId}/users/${currentUser.uid}/flow/state`).set(sd);}catch(e){}} if(isActive)sessionStorage.setItem('flowState',JSON.stringify(sd));else sessionStorage.removeItem('flowState'); }
 
@@ -459,7 +523,8 @@
             window.addEventListener('scroll', handleProgressBarVisibility);
             await initFirebase();
             await cleanupOldTasks();
-            ensureSetupTask(); ensureGiaoLyTask(); ensureQuanAmTask(); ensureThongKinhTask(); ensureCanBangAmDuongTask(); ensureCanBangDoshaTask();
+            ensureSetupTask(); ensureGiaoLyTask(); ensureQuanAmTask(); ensureCanBangAmDuongTask(); ensureCanBangDoshaTask(); ensureThongKinhTask();
+            ensureMassageTask(); ensureLuyenHatTask(); ensureSangTacTask();
             setTimeout(() => { initDragAndDrop('list-q1'); initDragAndDrop('list-q2'); sortTasksByOrder('q1'); sortTasksByOrder('q2'); }, 500);
             const savedAudioBlob = await loadRingtoneFromDB();
             if (savedAudioBlob) { audioPlayer.src = URL.createObjectURL(savedAudioBlob); hasAudioFile = true; updateAudioButtonDisplay(); }
@@ -471,9 +536,9 @@
                     const cfg = JSON.parse(__firebase_config);
                     firebase.initializeApp(cfg); db = firebase.firestore(); auth = firebase.auth();
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await auth.signInWithCustomToken(__initial_auth_token); } else { await auth.signInAnonymously(); }
-                    auth.onAuthStateChanged((user) => { currentUser = user; if (user) { loadSavedTasksFirestore().then(() => { ensureSetupTask(); ensureGiaoLyTask(); ensureQuanAmTask(); ensureThongKinhTask(); ensureCanBangAmDuongTask(); ensureCanBangDoshaTask(); }); } else { loadSavedTasksMemory(); ensureSetupTask(); ensureGiaoLyTask(); ensureQuanAmTask(); ensureThongKinhTask(); ensureCanBangAmDuongTask(); ensureCanBangDoshaTask(); } });
-                } catch (e) { loadSavedTasksMemory(); ensureSetupTask(); ensureGiaoLyTask(); ensureQuanAmTask(); ensureThongKinhTask(); ensureCanBangAmDuongTask(); ensureCanBangDoshaTask(); }
-            } else { loadSavedTasksMemory(); ensureSetupTask(); ensureGiaoLyTask(); ensureQuanAmTask(); ensureThongKinhTask(); ensureCanBangAmDuongTask(); ensureCanBangDoshaTask(); }
+                    auth.onAuthStateChanged((user) => { currentUser = user; if (user) { loadSavedTasksFirestore().then(() => { ensureSetupTask(); ensureGiaoLyTask(); ensureQuanAmTask(); ensureCanBangAmDuongTask(); ensureCanBangDoshaTask(); ensureThongKinhTask(); ensureMassageTask(); ensureLuyenHatTask(); ensureSangTacTask(); }); } else { loadSavedTasksMemory(); ensureSetupTask(); ensureGiaoLyTask(); ensureQuanAmTask(); ensureCanBangAmDuongTask(); ensureCanBangDoshaTask(); ensureThongKinhTask(); ensureMassageTask(); ensureLuyenHatTask(); ensureSangTacTask(); } });
+                } catch (e) { loadSavedTasksMemory(); ensureSetupTask(); ensureGiaoLyTask(); ensureQuanAmTask(); ensureCanBangAmDuongTask(); ensureCanBangDoshaTask(); ensureThongKinhTask(); ensureMassageTask(); ensureLuyenHatTask(); ensureSangTacTask(); }
+            } else { loadSavedTasksMemory(); ensureSetupTask(); ensureGiaoLyTask(); ensureQuanAmTask(); ensureCanBangAmDuongTask(); ensureCanBangDoshaTask(); ensureThongKinhTask(); ensureMassageTask(); ensureLuyenHatTask(); ensureSangTacTask(); }
         }
     </script>
 </body>
